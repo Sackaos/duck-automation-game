@@ -1,4 +1,4 @@
-package com.example.duck_automation_game;
+package com.example.duck_automation_game.engine;
 
 import java.util.HashMap;
 import java.util.Map;

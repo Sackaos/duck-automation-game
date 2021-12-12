@@ -20,7 +20,7 @@
             android:id="@+id/lvResourceList"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.3"
+            android:layout_weight="0.4"
             android:divider="@color/material_blue_grey_800"
             android:dividerHeight="1dp"
             android:footerDividersEnabled="false" />
@@ -28,7 +28,7 @@
         android:id="@+id/lvBuildings"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="0.5"
+        android:layout_weight="0.6"
 
         android:divider="@color/material_blue_grey_800"
         android:dividerHeight="1dp"

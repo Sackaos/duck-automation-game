@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class GameState {
     GameMap map;
-    Map<String, Double> playerResource;
+    public Map<String, Double> playerResource;
     Resource[] resourcesList;
 
 
@@ -13,7 +13,8 @@ public class GameState {
         this.playerResource = new HashMap<>();
 
         //TODO: load the catalog from a file
-        String[] resourcesNames = new String[]{"iron", "watermelons", "ducks", "pancakes"};
+        String[] resourcesNames = new String[]{"iron", "watermelons", "ducks", "pancakes","wood","spice melange"};
+
         this.resourcesList = new Resource[resourcesNames.length];
         for (int i = 0; i < resourcesList.length; i++) {
             // Create the resource and add it to the catalog
@@ -29,4 +30,7 @@ public class GameState {
 
     }
 
+    public Map<String, Double> getPlayerResource() {
+        return this.playerResource;
+    }
 }

@@ -14,15 +14,12 @@ public class MapGenerator {
 
         for (int i = 0; i < mapTiles.length; i++) {
             for (int j = 0; j < mapTiles[i].length; j++) {
-                MapTile mapTile;
                 // TODO: check that  j,i is x,y (and they are not flipped)
                 MapCoordinates mapCoordinates = new MapCoordinates(j, i);
 
                 Map<String, Double> resourcesRichness = generateResourceRichness(resourcesList, noiseMap[i][j]);
 
-                mapTile = new MapTile(mapCoordinates, resourcesRichness);
-
-                mapTiles[i][j] = mapTile;
+                mapTiles[i][j] = new MapTile(mapCoordinates, resourcesRichness);
             }
         }
 

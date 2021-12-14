@@ -1,10 +1,18 @@
-{resources:[
-{name:"iron"}
-{name:"pancakes"}
-{name:"watermelons"}
-{name:"wood"}
-{name:"spice melange"}
-{name:"ducks"}
-{name:"resource1"}
-{name:"cocaine"}
+{"resources":[
+{
+  "name":"iron"},
+{
+  "name":"pancakes"},
+{
+  "name":"watermelons"},
+{
+  "name":"wood"},
+{
+  "name":"spice melange"},
+{
+  "name":"ducks"},
+{
+  "name":"resource1"},
+{
+  "name":"cocaine"}
 ]}

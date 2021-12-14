@@ -1,7 +1,7 @@
 package com.example.duck_automation_game.engine;
 
 import android.util.Log;
-
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,7 +17,8 @@ public class GameState {
         this.playerProduction = new HashMap<>();
 
         //TODO: load the catalog from a file
-        String[] resourcesNames = new String[]{"iron", "watermelons", "ducks", "pancakes", "wood", "spice melange"};
+        String[] resourcesNames = getResourcesFromJson();
+        //String[] resourcesNames = new String[]{"iron", "watermelons", "ducks", "pancakes", "wood", "spice melange","rightful vengeance","resource1","resource2","resource3"};
 
         this.resourcesList = new Resource[resourcesNames.length];
         for (int i = 0; i < resourcesList.length; i++) {
@@ -35,13 +36,22 @@ public class GameState {
 
     }
 
+    private String[] getResourcesFromJson() {
+
+
+        return null;
+    }
+
     public Map<String, Double> getPlayerResource() {
         return this.playerResource;
     }
+
     public Map<String, Double> getPlayerProduction() {
         return this.playerProduction;
     }
+
     public Resource[] getResourceList() {
+
         return resourcesList;
     }
 

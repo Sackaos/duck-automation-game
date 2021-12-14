@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.4"
             android:divider="@color/material_blue_grey_800"
-            android:dividerHeight="1dp"
+            android:dividerHeight="1.5dp"
             android:footerDividersEnabled="false" />
         <ListView
         android:id="@+id/lvBuildings"

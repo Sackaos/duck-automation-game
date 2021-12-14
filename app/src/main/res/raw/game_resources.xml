@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <resource>
+        <name>iron</name>
+    </resource>
+    <resource>
+        <name>wood</name>
+    </resource>
+    <resource>
+        <name>BBQ</name>
+    </resource>
+</resources>

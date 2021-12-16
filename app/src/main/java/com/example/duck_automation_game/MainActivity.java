@@ -3,6 +3,8 @@ package com.example.duck_automation_game;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -20,8 +22,12 @@ import com.example.duck_automation_game.engine.Resource;
 import com.example.duck_automation_game.engine.Update;
 import com.example.duck_automation_game.ui.CustomListAdapter;
 import com.example.duck_automation_game.ui.CustomListItemModel;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
@@ -32,23 +38,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     CustomListAdapter adapter;
     Update updater;
     ArrayList<CustomListItemModel> resourceArr;
+    SharedPreferences sharedPref;
+    public String PLAYER_RESOURCE_PREFKEY = "resourceprefkey";
+    String TAG = "GAD";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        gameState = new GameState();
+        sharedPref = getSharedPreferences("myPrefs", MODE_PRIVATE);
+        gameState = new GameState(this);
         resourcesList = gameState.getResourceList();
-        Log.d("GAD", "GameState created!");
+        Log.d(TAG, "GameState created!");
         createResourcesListView(gameState);
-
-
-        initiateUpdate(this);
+        initiateUpdater(this);
 
 
     }
 
-    private void initiateUpdate(MainActivity main) {
+    private void initiateUpdater(MainActivity main) {
         Handler h = new Handler(Looper.myLooper()) {
             @Override
             public void handleMessage(@NonNull Message msg) {
@@ -58,19 +66,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         };
         updater = new Update(h, gameState, this);
         updater.start();
-
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                for (int i = 0; i <10 ; i++) {
-//                    Log.d("GAD", "Thread: " + i);
-//                    SystemClock.sleep(1000);
-//                    gameState.update(1);
-//                    main.notifyAdapter();
-//
-//                }
-//            }
-//        }).start();
     }
 
     public void createResourcesListView(GameState gameState) {
@@ -81,19 +76,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.iron);
 
-//        for (String key : playerResource.keySet()) {
-//            //clm=custom list object
-//            Log.d("GAD", key);
-//
-//            CustomListItemModel obj = new CustomListItemModel(key, playerResource.get(key),formatProductionValue(playerProduction.get(key)));
-//            resourceArr.add(obj);
-//        }
         for (int i = 0; i < resourcesList.length; i++) {
-            CustomListItemModel obj = new CustomListItemModel(resourcesList[i].getName(), playerResource.get(resourcesList[i].getName()), formatProductionValue(playerProduction.get(resourcesList[i].getName())));
-            resourceArr.add(obj);
+            String currentResourceName = resourcesList[i].getName();
+            CustomListItemModel item = new CustomListItemModel(currentResourceName, formatResouceValue((currentResourceName)), formatProductionValue(currentResourceName));
+            resourceArr.add(item);
         }
 
-        Log.d("GAD", "afterparty");
+        Log.d(TAG, "afterparty");
         adapter = new CustomListAdapter(this, 0, 0, resourceArr);
         ListView lvResources = (ListView) findViewById(R.id.lvResourceList);
         lvResources.setOnItemClickListener(this);
@@ -113,56 +102,126 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 length).show();
     }
 
-//    public void update(Map<String, Double> playerResource){
-//        Map<String, Double> newResource
-//        playerResource.put()
-//    }
-
-    public String formatProductionValue(Double production) {
-        if (production > 0) return "+" + production;
-            //unnecessary else lmao #flex
-        else if (production < 0) return "-" + production;
-        return "" + production;
-    }
 
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         //changes the data
         Map<String, Double> playerProductionMap = gameState.getPlayerProduction();
         String resourceName = resourcesList[i].getName();
-        playerProductionMap.put(resourceName, playerProductionMap.get(resourceName) + 1.0d);
-        //logs the action
-        Log.d("GAD", "changeProduction: " + resourceName + ": " + playerProductionMap.get(resourceName));
-        String toastMessage = "name:" + resourceName;
-        showToast(toastMessage, Toast.LENGTH_SHORT);
+        playerProductionMap.put(resourceName, playerProductionMap.get(resourceName) + 50.0001d);
+        //Log.d(TAG, "changeProduction: " + resourceName + ": " + playerProductionMap.get(resourceName));
         //notifies the listView
-        CustomListItemModel item = new CustomListItemModel(resourceName, playerResource.get(resourceName), formatProductionValue(playerProduction.get(resourceName)));
+        CustomListItemModel item = new CustomListItemModel(resourceName, formatResouceValue(resourceName), formatProductionValue(resourceName));
         resourceArr.set(i, item);
         notifyAdapter();
-        if (resourceName.equals("iron")) updater.interrupt();
-
-        for (String key : playerResource.keySet()) {
-            Log.d("GAD", "PlayerResource(map): " +playerResource.get(key));
-        }
-        for (int J = 0; J < resourcesList.length; J++) {
-            Log.d("GAD","resourceList: "+J+resourcesList[J].getName()+"    ResourceARR     "+
-            resourceArr.get(J).getResourceName());
-        }
-        }
+//        if (resourceName.equals("iron")) updater.interrupt();
+//
+//        for (String key : playerResource.keySet()) {
+//            Log.d(TAG, "PlayerResource(map): " +playerResource.get(key));
+//        }
+//        for (int J = 0; J < resourcesList.length; J++) {
+//            Log.d(TAG,"resourceList: "+J+resourcesList[J].getName()+"    ResourceARR     "+
+//            resourceArr.get(J).getResourceName());
+//        }
+    }
 
     /**
-     * either dont send anything to update all the list
-     * or send the item that needs to be changed and what it needs to be changed into
+     * every time theres a change in the data the view needs to get updated which is what notifyAdapter does
      */
     public void notifyAdapter() {
-        int i = 0;
-        for (String key : playerResource.keySet()) {
-            CustomListItemModel item = new CustomListItemModel(key, playerResource.get(key), formatProductionValue(playerProduction.get(key)));
+        for (int i = 0; i < resourcesList.length; i++) {
+            CustomListItemModel currentItem = resourceArr.get(i);
+            String currentItemName = currentItem.getResourceName();
+            String currentItemResource = formatResouceValue(currentItemName);
+            String currentItemProduction = formatProductionValue(currentItemName);
+            CustomListItemModel item = new CustomListItemModel(currentItemName, currentItemResource, currentItemProduction);
             resourceArr.set(i, item);
-            i++;
         }
         adapter.notifyDataSetChanged();
 
     }
 
+    public String formatProductionValue(String key) {
+        Double production = playerProduction.get(key);
+        production = Double.parseDouble(new DecimalFormat("#####.##").format(production));
+        String s = "";
+
+        if (production > 0) s = "+";
+        else if (production < 0) s = "-";
+
+        if (production >= 1000 || production <= -1000) {
+            production = Double.parseDouble(new DecimalFormat("#####.##").format(production / 1000));
+            s = s + production + "K";
+        } else s = s + production;
+        return s;
+    }
+
+    private String formatResouceValue(String key) {
+        Double resourceVal = playerResource.get(key);
+        String s;
+        if (resourceVal >= 1000) {
+            Double d = Double.parseDouble(new DecimalFormat("#####.##").format(resourceVal / 1000));
+            s = d + "K";
+        } else {
+            Double d = Double.parseDouble(new DecimalFormat("#####.##").format(resourceVal));
+            s = "" + d;
+        }
+        return s;
+    }
+
+    private void hashmaptest() {
+        //create test hashmap
+        HashMap<String, Double> testHashMap = new HashMap<String, Double>();
+        testHashMap.put("key1", 0.5);
+        testHashMap.put("key2", 0.1);
+
+        //convert to string using gson
+        Gson gson = new Gson();
+        String hashMapString = gson.toJson(testHashMap);
+        Log.d("GAD", "hashmaptest: "+hashMapString);
+        //save in shared prefs
+        sharedPref.edit().putString("hashString", hashMapString).apply();
+
+        //get from shared prefs
+        String storedHashMapString = sharedPref.getString("hashString", "oopsDintWork");
+        java.lang.reflect.Type type = new TypeToken<HashMap<String, Double>>() {
+        }.getType();
+        HashMap<String, Double> testHashMap2 = gson.fromJson(storedHashMapString, type);
+
+        //use values
+        String toastString = testHashMap2.get("key1") + " | " + testHashMap2.get("iron");
+        Log.d(TAG, "hashmaptest: " + toastString);
+        Toast.makeText(this, toastString, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        updater.interrupt();
+        SystemClock.sleep(500);
+        //save to shared pref
+
+        //convert to string using gson
+        Gson gson = new Gson();
+        String resourceMapString = gson.toJson(playerResource);
+        Log.d("GAD", "onDestroy!!!!!!: " + resourceMapString);
+        //save in shared prefs
+        sharedPref.edit().putString(PLAYER_RESOURCE_PREFKEY, resourceMapString).apply();
+        hashmaptest();
+//        playerProduction;
+//        playerResource;
+//        String value = sharedPref.getString(PLAYER_RESOURCE_PREFKEY, "");
+
+        super.onDestroy();
+    }
+
+    public Map<String, Double> getMapFromPrefs(String prefKey) {
+        Gson gson = new Gson();
+        //get from shared prefs
+        String storedHashMapString = sharedPref.getString(prefKey, null);
+        if (storedHashMapString == null) return null;
+        java.lang.reflect.Type type = new TypeToken<HashMap<String, Double>>() {
+        }.getType();
+        HashMap<String, Double> hashMap = gson.fromJson(storedHashMapString, type);
+        return hashMap;
+    }
 
 }

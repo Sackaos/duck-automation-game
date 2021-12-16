@@ -17,7 +17,6 @@ public class Update extends Thread {
     Handler handler;
     GameState gameState;
     MainActivity mainActivity;
-
     public Update(Handler handler, GameState gameState, MainActivity mainActivity
     ) {
         this.mainActivity = mainActivity;
@@ -32,14 +31,14 @@ public class Update extends Thread {
         while (!this.isInterrupted()) {
             if (Thread.currentThread().isInterrupted()) Log.d("GAD", "run: RUN YOU FOOl");
 
-            gameState.update(1);
+            gameState.update(0.2);
             //this.mainActivity.notifyAdapter();
 
             Message msg = new Message();
             msg.obj = "REEEEEEEEEEEEEEEE";
             handler.sendMessage(msg);
 
-            SystemClock.sleep(1000);
+            SystemClock.sleep(200);
 
          }
 

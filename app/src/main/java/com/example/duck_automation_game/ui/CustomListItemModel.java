@@ -7,9 +7,9 @@ public class CustomListItemModel {
     // Bitmap bitmap;
     String resourceName;
     String resourceProduction;
-    Double resourceAmount;
+    String resourceAmount;
 
-    public CustomListItemModel(String resourceName, Double resourceAmount,String resourceProduction) {
+    public CustomListItemModel(String resourceName, String resourceAmount,String resourceProduction) {
         // this.bitmap=bitmap;
         this.resourceName = resourceName;
         this.resourceProduction=resourceProduction;
@@ -23,7 +23,7 @@ public class CustomListItemModel {
     public String getResourceProduction() {
         return this.resourceProduction;
     }
-    public Double getResourceAmount() {
+    public String getResourceAmount() {
         return this.resourceAmount;
     }
 

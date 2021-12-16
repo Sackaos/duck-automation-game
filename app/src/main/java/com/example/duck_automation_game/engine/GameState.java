@@ -1,8 +1,13 @@
 package com.example.duck_automation_game.engine;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.example.duck_automation_game.MainActivity;
+
+import android.content.SharedPreferences;
+import android.preference.Preference;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -13,23 +18,36 @@ public class GameState {
     public Map<String, Double> playerResource;
     public Map<String, Double> playerProduction;
     Resource[] resourcesList;
+    private SharedPreferences sharedPref;
 
 
-    public GameState() {
+    public GameState(MainActivity main) {
         this.playerResource = new HashMap<>();
         this.playerProduction = new HashMap<>();
 
         //TODO: load the catalog from a file
-        String[] resourcesNames = new String[]{"iron", "watermelons", "ducks", "pancakes", "wood", "spice melange","rightful vengeance","resource1","resource2","resource3"};
-
+        String[] resourcesNames = new String[]{"iron", "watermelons", "ducks", "pancakes", "wood", "spice melange", "rightful vengeance", "resource1", "resource2", "resource3"};
+        playerResource = main.getMapFromPrefs(main.PLAYER_RESOURCE_PREFKEY);
+        if (playerResource == null) {
+            this.playerResource = new HashMap<>();
+        }
         this.resourcesList = new Resource[resourcesNames.length];
+
         for (int i = 0; i < resourcesList.length; i++) {
+            String currentName = resourcesNames[i];
+            Double value;
+
             // Create the resource and add it to the catalog
-            this.resourcesList[i] = new Resource(resourcesNames[i]);
+            this.resourcesList[i] = new Resource(currentName);
+
+        if (playerResource.get(currentName)!=null) value = playerResource.get(currentName);
+        else value=0.0;
+            Log.d("GAD", "GameState1: " + value + playerResource + currentName);
 
             // set this same resource in the player starting resources
-            this.playerResource.put(this.resourcesList[i].name, 0.0);
-            this.playerProduction.put(this.resourcesList[i].name, 0.0);
+            this.playerResource.put(currentName, value);
+            this.playerProduction.put(currentName, 0.0);
+
         }
 
 
@@ -39,7 +57,6 @@ public class GameState {
     }
 
 
-
     /**
      * update the game state per seconds
      *
@@ -47,62 +64,21 @@ public class GameState {
      */
     public void update(double timeOffset) {
         // if we had 1 w00d in player res, and we have +1.5 wood producation
-        // and we have timeOffset of 3 seconds we want that playa resoursa is gonna be
+        // and we have timeOffset of 3 seconds we want that player's resource is gonna be
         // 1 + (3*1.5)
-        // do you understand, my man?! <> ==> www.burgerIsBadFOrYOuButWe<3itAnyroads.gov.zulu
+        //==> www.burgerIsBadFOrYOuButWe<3itAnyroads.gov.zulu
 
         for (String key : this.playerResource.keySet()) {
             Double currentResourceValue = this.playerResource.get(key);
             Double currentProdcution = this.playerProduction.get(key);
 
-            Double newResourceAmount=currentResourceValue +(currentProdcution*timeOffset);
-            this.playerResource.put(key,newResourceAmount);
+            Double newResourceAmount = currentResourceValue + (currentProdcution * timeOffset);
+            this.playerResource.put(key, newResourceAmount);
             //Log.d("GAD", "update: "+playerResource.get(key));
             //notifyAdapter();
 
         }
     }
-//    private void func() {
-////        new BufferedInputStream(getResources().openRawResource("game_res"));
-//        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-//        try {
-//            DocumentBuilder builder = factory.newDocumentBuilder();
-//            Document document= builder.parse(new File("game_resources.xml"));
-//
-//            //normalize the structure
-//            document.getDocumentElement().normalize();
-//            //put the XML into a nodelist
-//            NodeList resourceNodeList = document.getElementsByTagName("resource");
-//
-//            for (int i = 0; i < resourceNodeList.getLength(); i++) {
-//                Node resource = resourceNodeList.item(i);
-//                if (true){
-//                    //element is now a single resource class
-//                    Element resourceElement = (Element) resource;
-//
-//                    Log.d("GAD", "name: "+resourceElement.getAttribute("name"));
-//                    NodeList resourceChildList= resource.getChildNodes();
-//
-//                    Log.d("GAD", "nmae: "+((Element)(resourceChildList.item(0))).getTagName()+"WAA"+((Element)(resourceChildList.item(0))).getTextContent());
-//
-//                }
-//                Element resourceElement = (Element) resource;
-//                Log.d("GAD", "name: "+resourceElement.getAttribute("name"));
-//
-//
-//            }
-//
-//        } catch (ParserConfigurationException e) {
-//            e.printStackTrace();
-//        } catch (SAXException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            Log.d("GAD", "func:3!!!!!!!!!! ");
-//        }
-//
-//    }
-
 
 
     public Map<String, Double> getPlayerResource() {

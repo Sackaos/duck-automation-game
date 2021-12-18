@@ -42,7 +42,7 @@ public class GameState {
 
         if (playerResource.get(currentName)!=null) value = playerResource.get(currentName);
         else value=0.0;
-            Log.d("GAD", "GameState1: " + value + playerResource + currentName);
+            //Log.d("GAD", "GameState1: " + value + playerResource + currentName);
 
             // set this same resource in the player starting resources
             this.playerResource.put(currentName, value);

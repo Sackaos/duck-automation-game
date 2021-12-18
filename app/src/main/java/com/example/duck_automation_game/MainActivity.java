@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         sharedPref = getSharedPreferences("myPrefs", MODE_PRIVATE);
         gameState = new GameState(this);
         resourcesList = gameState.getResourceList();
-        Log.d(TAG, "GameState created!");
+        Log.d(TAG, "on create: GameState created!");
         createResourcesListView(gameState);
         initiateUpdater(this);
 
@@ -82,7 +82,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             resourceArr.add(item);
         }
 
-        Log.d(TAG, "afterparty");
         adapter = new CustomListAdapter(this, 0, 0, resourceArr);
         ListView lvResources = (ListView) findViewById(R.id.lvResourceList);
         lvResources.setOnItemClickListener(this);
@@ -148,6 +147,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if (production > 0) s = "+";
         else if (production < 0) s = "-";
 
+        if (production >= 1000000|| production <= -1000000) {
+            Double d = Double.parseDouble(new DecimalFormat("###.##").format(production / 1000000));
+            s = d + "M";
+        }
         if (production >= 1000 || production <= -1000) {
             production = Double.parseDouble(new DecimalFormat("#####.##").format(production / 1000));
             s = s + production + "K";
@@ -158,11 +161,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private String formatResouceValue(String key) {
         Double resourceVal = playerResource.get(key);
         String s;
-        if (resourceVal >= 1000) {
-            Double d = Double.parseDouble(new DecimalFormat("#####.##").format(resourceVal / 1000));
+        if (resourceVal >= 1000000) {
+            Double d = Double.parseDouble(new DecimalFormat("###.##").format(resourceVal / 1000000));
+            s = d + "M";
+        }
+
+        else if (resourceVal >= 1000) {
+            Double d = Double.parseDouble(new DecimalFormat("###.##").format(resourceVal / 1000));
             s = d + "K";
-        } else {
-            Double d = Double.parseDouble(new DecimalFormat("#####.##").format(resourceVal));
+        }
+
+        else {
+            Double d = Double.parseDouble(new DecimalFormat("###.##").format(resourceVal));
             s = "" + d;
         }
         return s;
@@ -177,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //convert to string using gson
         Gson gson = new Gson();
         String hashMapString = gson.toJson(testHashMap);
-        Log.d("GAD", "hashmaptest: "+hashMapString);
+        Log.d("GAD", "hashmapt!est: "+hashMapString);
         //save in shared prefs
         sharedPref.edit().putString("hashString", hashMapString).apply();
 
@@ -189,15 +199,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //use values
         String toastString = testHashMap2.get("key1") + " | " + testHashMap2.get("iron");
-        Log.d(TAG, "hashmaptest: " + toastString);
+        Log.d(TAG, "hashmaptest!: " + toastString);
         Toast.makeText(this, toastString, Toast.LENGTH_LONG).show();
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onStop() {
+        super.onStop();
         updater.interrupt();
-        SystemClock.sleep(500);
-        //save to shared pref
+        //SystemClock.sleep(201);
+
+        //saves to shared pref
 
         //convert to string using gson
         Gson gson = new Gson();
@@ -205,12 +217,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Log.d("GAD", "onDestroy!!!!!!: " + resourceMapString);
         //save in shared prefs
         sharedPref.edit().putString(PLAYER_RESOURCE_PREFKEY, resourceMapString).apply();
-        hashmaptest();
-//        playerProduction;
-//        playerResource;
-//        String value = sharedPref.getString(PLAYER_RESOURCE_PREFKEY, "");
-
-        super.onDestroy();
     }
 
     public Map<String, Double> getMapFromPrefs(String prefKey) {

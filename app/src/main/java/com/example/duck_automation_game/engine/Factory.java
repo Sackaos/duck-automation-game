@@ -6,7 +6,8 @@ public class Factory {
     String name;
     Map<String,Double> ProductionMap;
     int instancesBuilt;
-
+    int x;
+    int y;
 
     public Factory(String name, Map<String, Double> productionMap, int instancesBuilt) {
         this.name = name;

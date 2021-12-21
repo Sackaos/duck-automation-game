@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.example.duck_automation_game.R;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,9 +36,47 @@ public class CustomListAdapter extends ArrayAdapter<CustomListItemModel> {
         CustomListItemModel temp = objects.get(position);
 
         tvResourceName.setText(String.valueOf(temp.getResourceName()));
-        tvResourceAmount.setText(String.valueOf(temp.getResourceAmount()));
-        tvResourceProduction.setText(String.valueOf(temp.getResourceProduction()));
+
+        tvResourceAmount.setText(formatResouceValue(temp.getResourceAmount()));
+        //String.valueOf());
+        tvResourceProduction.setText(formatProductionValue(temp.getResourceProduction()));
         return view;
 
+    }
+    public String formatProductionValue(Double productionAmount) {
+        productionAmount = Double.parseDouble(new DecimalFormat("#####.##").format(productionAmount));
+        String s = "";
+
+        if (productionAmount > 0) s = "+";
+        else if (productionAmount < 0) s = "-";
+
+        if (productionAmount >= 1000000|| productionAmount <= -1000000) {
+            Double d = Double.parseDouble(new DecimalFormat("###.##").format(productionAmount / 1000000));
+            s = d + "M";
+        }
+        if (productionAmount >= 1000 || productionAmount <= -1000) {
+            productionAmount = Double.parseDouble(new DecimalFormat("#####.##").format(productionAmount / 1000));
+            s = s + productionAmount + "K";
+        } else s = s + productionAmount;
+        return s;
+    }
+
+    private String formatResouceValue(Double resourceAmount) {
+        String s;
+        if (resourceAmount >= 1000000) {
+            Double d = Double.parseDouble(new DecimalFormat("###.##").format(resourceAmount / 1000000));
+            s = d + "M";
+        }
+
+        else if (resourceAmount >= 1000) {
+            Double d = Double.parseDouble(new DecimalFormat("###.##").format(resourceAmount / 1000));
+            s = d + "K";
+        }
+
+        else {
+            Double d = Double.parseDouble(new DecimalFormat("###.##").format(resourceAmount));
+            s = "" + d;
+        }
+        return s;
     }
 }

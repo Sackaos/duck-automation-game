@@ -6,10 +6,10 @@ import android.view.View;
 public class CustomListItemModel {
     // Bitmap bitmap;
     String resourceName;
-    String resourceProduction;
-    String resourceAmount;
+    Double resourceProduction;
+    Double resourceAmount;
 
-    public CustomListItemModel(String resourceName, String resourceAmount,String resourceProduction) {
+    public CustomListItemModel(String resourceName, Double resourceAmount,Double resourceProduction) {
         // this.bitmap=bitmap;
         this.resourceName = resourceName;
         this.resourceProduction=resourceProduction;
@@ -20,12 +20,19 @@ public class CustomListItemModel {
     public String getResourceName() {
         return this.resourceName;
     }
-    public String getResourceProduction() {
+    public Double getResourceProduction() {
         return this.resourceProduction;
     }
-    public String getResourceAmount() {
+    public Double getResourceAmount() {
         return this.resourceAmount;
     }
 
+    public void setResourceProduction(Double resourceProduction) {
+        this.resourceProduction = resourceProduction;
+    }
+
+    public void setResourceAmount(Double resourceAmount) {
+        this.resourceAmount = resourceAmount;
+    }
 }
 

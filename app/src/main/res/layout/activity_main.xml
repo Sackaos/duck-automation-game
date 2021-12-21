@@ -4,47 +4,47 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:weightSum="1"
     tools:context=".MainActivity"
     android:background="#020017">
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="500dp"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_weight="0.5"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:weightSum="1">
 
         <ListView
             android:id="@+id/lvResourceList"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.4"
+            android:layout_width="150dp"
+            android:layout_height="0dp"
+            android:layout_weight="0.6"
             android:divider="@color/material_blue_grey_800"
             android:dividerHeight="1.5dp"
             android:footerDividersEnabled="false" />
-        <ListView
-        android:id="@+id/lvBuildings"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="0.6"
 
-        android:divider="@color/material_blue_grey_800"
-        android:dividerHeight="1dp"
-        android:footerDividersEnabled="false" />
     </LinearLayout>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_marginTop="15dp"
-        android:layout_width="match_parent"
-        android:layout_height="500dp"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_weight="0.5"
         android:weightSum="1">
+        <ListView
+            android:id="@+id/lvBuildings"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
 
+            android:divider="@color/material_blue_grey_800"
+            android:dividerHeight="1dp"
+            android:footerDividersEnabled="false" />
 
     </LinearLayout>
+
 
 </LinearLayout>
 

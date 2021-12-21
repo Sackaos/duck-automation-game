@@ -3,14 +3,11 @@ package com.example.duck_automation_game;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.os.SystemClock;
-import android.renderscript.Sampler;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -25,7 +22,6 @@ import com.example.duck_automation_game.ui.CustomListItemModel;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,13 +29,12 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
     GameState gameState;
     Resource[] resourcesList;
-    Map<String, Double> playerResource;
-    Map<String, Double> playerProduction;
     CustomListAdapter adapter;
     Update updater;
-    ArrayList<CustomListItemModel> resourceArr;
+    ArrayList<CustomListItemModel> resourceArrList;
     SharedPreferences sharedPref;
-    public String PLAYER_RESOURCE_PREFKEY = "resourceprefkey";
+    public String PLAYER_FACTORY_PREFKEY = "factoryprefkey";
+    public String LAST_TIME_LOGGED = "dateprefkey";
     String TAG = "GAD";
 
     @Override
@@ -49,14 +44,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         sharedPref = getSharedPreferences("myPrefs", MODE_PRIVATE);
         gameState = new GameState(this);
         resourcesList = gameState.getResourceList();
+        resourceArrList = gameState.getResourceArrList();
         Log.d(TAG, "on create: GameState created!");
-        createResourcesListView(gameState);
+        createAdapter();
         initiateUpdater(this);
 
 
     }
 
     private void initiateUpdater(MainActivity main) {
+        Long lastLogin = sharedPref.getLong(LAST_TIME_LOGGED, System.currentTimeMillis());
+        Long timeSinceLastLogin = (System.currentTimeMillis() - lastLogin) / 1000;
+        gameState.update(timeSinceLastLogin);
         Handler h = new Handler(Looper.myLooper()) {
             @Override
             public void handleMessage(@NonNull Message msg) {
@@ -68,21 +67,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         updater.start();
     }
 
-    public void createResourcesListView(GameState gameState) {
-
-        resourceArr = new ArrayList<>();
-        playerResource = gameState.getPlayerResource();
-        playerProduction = gameState.getPlayerProduction();
-
-        //Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.iron);
-
-        for (int i = 0; i < resourcesList.length; i++) {
-            String currentResourceName = resourcesList[i].getName();
-            CustomListItemModel item = new CustomListItemModel(currentResourceName, formatResouceValue((currentResourceName)), formatProductionValue(currentResourceName));
-            resourceArr.add(item);
-        }
-
-        adapter = new CustomListAdapter(this, 0, 0, resourceArr);
+    public void createAdapter() {
+        adapter = new CustomListAdapter(this, 0, 0, resourceArrList);
         ListView lvResources = (ListView) findViewById(R.id.lvResourceList);
         lvResources.setOnItemClickListener(this);
         lvResources.setAdapter(adapter);
@@ -96,30 +82,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
 
-    public void showToast(String message, int length) {
-        Toast.makeText(this, message,
-                length).show();
-    }
-
-
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         //changes the data
-        Map<String, Double> playerProductionMap = gameState.getPlayerProduction();
         String resourceName = resourcesList[i].getName();
-        playerProductionMap.put(resourceName, playerProductionMap.get(resourceName) + 50.0001d);
-        //Log.d(TAG, "changeProduction: " + resourceName + ": " + playerProductionMap.get(resourceName));
-        //notifies the listView
-        CustomListItemModel item = new CustomListItemModel(resourceName, formatResouceValue(resourceName), formatProductionValue(resourceName));
-        resourceArr.set(i, item);
+        CustomListItemModel currentItem = resourceArrList.get(i);
+        Double newProduction = currentItem.getResourceProduction()+50.015D;
+        currentItem.setResourceProduction(newProduction);
+
         notifyAdapter();
 //        if (resourceName.equals("iron")) updater.interrupt();
 //
 //        for (String key : playerResource.keySet()) {
 //            Log.d(TAG, "PlayerResource(map): " +playerResource.get(key));
-//        }
-//        for (int J = 0; J < resourcesList.length; J++) {
-//            Log.d(TAG,"resourceList: "+J+resourcesList[J].getName()+"    ResourceARR     "+
-//            resourceArr.get(J).getResourceName());
 //        }
     }
 
@@ -128,55 +102,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
      */
     public void notifyAdapter() {
         for (int i = 0; i < resourcesList.length; i++) {
-            CustomListItemModel currentItem = resourceArr.get(i);
-            String currentItemName = currentItem.getResourceName();
-            String currentItemResource = formatResouceValue(currentItemName);
-            String currentItemProduction = formatProductionValue(currentItemName);
-            CustomListItemModel item = new CustomListItemModel(currentItemName, currentItemResource, currentItemProduction);
-            resourceArr.set(i, item);
+//            CustomListItemModel currentItem = resourceArrList.get(i);
+//            String currentItemName = currentItem.getResourceName();
+//            CustomListItemModel item = new CustomListItemModel(currentItemName, playerResource.get(currentItemName), playerProduction.get(currentItemName));
+//            resourceArrList.set(i, item);
         }
         adapter.notifyDataSetChanged();
 
     }
 
-    public String formatProductionValue(String key) {
-        Double production = playerProduction.get(key);
-        production = Double.parseDouble(new DecimalFormat("#####.##").format(production));
-        String s = "";
-
-        if (production > 0) s = "+";
-        else if (production < 0) s = "-";
-
-        if (production >= 1000000|| production <= -1000000) {
-            Double d = Double.parseDouble(new DecimalFormat("###.##").format(production / 1000000));
-            s = d + "M";
-        }
-        if (production >= 1000 || production <= -1000) {
-            production = Double.parseDouble(new DecimalFormat("#####.##").format(production / 1000));
-            s = s + production + "K";
-        } else s = s + production;
-        return s;
-    }
-
-    private String formatResouceValue(String key) {
-        Double resourceVal = playerResource.get(key);
-        String s;
-        if (resourceVal >= 1000000) {
-            Double d = Double.parseDouble(new DecimalFormat("###.##").format(resourceVal / 1000000));
-            s = d + "M";
-        }
-
-        else if (resourceVal >= 1000) {
-            Double d = Double.parseDouble(new DecimalFormat("###.##").format(resourceVal / 1000));
-            s = d + "K";
-        }
-
-        else {
-            Double d = Double.parseDouble(new DecimalFormat("###.##").format(resourceVal));
-            s = "" + d;
-        }
-        return s;
-    }
 
     private void hashmaptest() {
         //create test hashmap
@@ -187,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //convert to string using gson
         Gson gson = new Gson();
         String hashMapString = gson.toJson(testHashMap);
-        Log.d("GAD", "hashmapt!est: "+hashMapString);
+        Log.d("GAD", "hashmapt!est: " + hashMapString);
         //save in shared prefs
         sharedPref.edit().putString("hashString", hashMapString).apply();
 
@@ -208,15 +142,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onStop();
         updater.interrupt();
         //SystemClock.sleep(201);
+        Long date = System.currentTimeMillis();
+        sharedPref.edit().putLong(LAST_TIME_LOGGED, date).apply();
 
-        //saves to shared pref
-
-        //convert to string using gson
-        Gson gson = new Gson();
-        String resourceMapString = gson.toJson(playerResource);
-        Log.d("GAD", "onDestroy!!!!!!: " + resourceMapString);
-        //save in shared prefs
-        sharedPref.edit().putString(PLAYER_RESOURCE_PREFKEY, resourceMapString).apply();
+        for (int i = 0; i < resourcesList.length; i++) {
+            String currentName = resourceArrList.get(i).getResourceName();
+            String currentAmount = "" + resourceArrList.get(i).getResourceAmount();
+            sharedPref.edit().putString(currentName, currentAmount).apply();
+        }
     }
 
     public Map<String, Double> getMapFromPrefs(String prefKey) {
@@ -228,6 +161,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }.getType();
         HashMap<String, Double> hashMap = gson.fromJson(storedHashMapString, type);
         return hashMap;
+    }
+
+    public String getStringFromPref(String prefKey, String defaultValue) {
+        return sharedPref.getString(prefKey, defaultValue);
     }
 
 }

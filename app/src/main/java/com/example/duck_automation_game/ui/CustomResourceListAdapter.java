@@ -14,11 +14,11 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomListAdapter extends ArrayAdapter<CustomListItemModel> {
+public class CustomResourceListAdapter extends ArrayAdapter<CustomResourceModel> {
     Context context;
-    List<CustomListItemModel> objects;
+    List<CustomResourceModel> objects;
 
-    public CustomListAdapter(Context context, int resource, int textViewResourceId, ArrayList<CustomListItemModel> modelList) {
+    public CustomResourceListAdapter(Context context, int resource, int textViewResourceId, ArrayList<CustomResourceModel> modelList) {
         super(context, 0, 0, modelList);
         this.context = context;
         this.objects = modelList;
@@ -27,13 +27,13 @@ public class CustomListAdapter extends ArrayAdapter<CustomListItemModel> {
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater layoutinflater = ((Activity) context).getLayoutInflater();
 
-        View view = layoutinflater.inflate(R.layout.custom_list_item, parent, false);
+        View view = layoutinflater.inflate(R.layout.custom_resource_model, parent, false);
 
         TextView tvResourceName = (TextView) view.findViewById(R.id.tvResourceName);
         TextView tvResourceAmount = (TextView) view.findViewById(R.id.tvResourceAmount);
         TextView tvResourceProduction = (TextView) view.findViewById(R.id.tvResourceProduction);
 
-        CustomListItemModel temp = objects.get(position);
+        CustomResourceModel temp = objects.get(position);
 
         tvResourceName.setText(String.valueOf(temp.getResourceName()));
 

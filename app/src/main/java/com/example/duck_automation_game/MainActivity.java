@@ -14,11 +14,13 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.duck_automation_game.engine.Factory;
 import com.example.duck_automation_game.engine.GameState;
 import com.example.duck_automation_game.engine.Resource;
 import com.example.duck_automation_game.engine.Update;
-import com.example.duck_automation_game.ui.CustomListAdapter;
-import com.example.duck_automation_game.ui.CustomListItemModel;
+import com.example.duck_automation_game.ui.CustomFactoryListAdapter;
+import com.example.duck_automation_game.ui.CustomResourceListAdapter;
+import com.example.duck_automation_game.ui.CustomResourceModel;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -29,9 +31,11 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
     GameState gameState;
     Resource[] resourcesList;
-    CustomListAdapter adapter;
+    CustomResourceListAdapter resourceAdapter;
+    CustomFactoryListAdapter factoryAdapter;
+    ArrayList<Factory> factoryList;
+    ArrayList<CustomResourceModel> resourceArrList;
     Update updater;
-    ArrayList<CustomListItemModel> resourceArrList;
     SharedPreferences sharedPref;
     public String PLAYER_FACTORY_PREFKEY = "factoryprefkey";
     public String LAST_TIME_LOGGED = "dateprefkey";
@@ -45,11 +49,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         gameState = new GameState(this);
         resourcesList = gameState.getResourceList();
         resourceArrList = gameState.getResourceArrList();
-        Log.d(TAG, "on create: GameState created!");
-        createAdapter();
+        createResourceAdapter();
+        factoryList = gameState.getPlayerfactories();
+        createFactoryAdapter();
         initiateUpdater(this);
-
-
+        Log.d(TAG, "on create: completed");
     }
 
     private void initiateUpdater(MainActivity main) {
@@ -60,18 +64,26 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void handleMessage(@NonNull Message msg) {
                 super.handleMessage(msg);
-                notifyAdapter();
+                notifyResourceAdapter();
             }
         };
         updater = new Update(h, gameState, this);
         updater.start();
     }
 
-    public void createAdapter() {
-        adapter = new CustomListAdapter(this, 0, 0, resourceArrList);
+    private void createFactoryAdapter() {
+        factoryAdapter = new CustomFactoryListAdapter(this, 0, 0, gameState.getPlayerfactories());
+        ListView lvFactories = (ListView) findViewById(R.id.lvFactories);
+        lvFactories.setOnItemClickListener(this);
+        lvFactories.setAdapter(factoryAdapter);
+
+    }
+
+    public void createResourceAdapter() {
+        resourceAdapter = new CustomResourceListAdapter(this, 0, 0, resourceArrList);
         ListView lvResources = (ListView) findViewById(R.id.lvResourceList);
         lvResources.setOnItemClickListener(this);
-        lvResources.setAdapter(adapter);
+        lvResources.setAdapter(resourceAdapter);
 
 //if want add new resource mid-game :
 //        playerProduction.put("NEWRESOURCE",0d);
@@ -83,13 +95,26 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        //changes the data
-        String resourceName = resourcesList[i].getName();
-        CustomListItemModel currentItem = resourceArrList.get(i);
-        Double newProduction = currentItem.getResourceProduction()+50.015D;
-        currentItem.setResourceProduction(newProduction);
 
-        notifyAdapter();
+        if (adapterView.getAdapter() instanceof CustomResourceListAdapter) {
+            Log.d(TAG, "onItemClick: ITS WROKING");
+
+            String resourceName = resourcesList[i].getName();
+            CustomResourceModel currentItem = resourceArrList.get(i);
+            Double newProduction = currentItem.getResourceProduction() + 50.015D / i;
+            currentItem.setResourceProduction(newProduction);
+        }
+
+        if (adapterView.getAdapter() instanceof CustomFactoryListAdapter) {
+            Log.d(TAG, "onItemClick: ITS REALLY WROKING  " + factoryList.get(i).getFactoryName());
+
+            gameState.BuildFactory(i);
+
+
+        }
+
+
+        notifyResourceAdapter();
 //        if (resourceName.equals("iron")) updater.interrupt();
 //
 //        for (String key : playerResource.keySet()) {
@@ -100,17 +125,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     /**
      * every time theres a change in the data the view needs to get updated which is what notifyAdapter does
      */
-    public void notifyAdapter() {
-        for (int i = 0; i < resourcesList.length; i++) {
+    public void notifyResourceAdapter() {
+//        for (int i = 0; i < resourcesList.length; i++) {
 //            CustomListItemModel currentItem = resourceArrList.get(i);
 //            String currentItemName = currentItem.getResourceName();
 //            CustomListItemModel item = new CustomListItemModel(currentItemName, playerResource.get(currentItemName), playerProduction.get(currentItemName));
 //            resourceArrList.set(i, item);
-        }
-        adapter.notifyDataSetChanged();
+//        }
+        resourceAdapter.notifyDataSetChanged();
 
     }
 
+    public void notifyFactoryAdapter() {factoryAdapter.notifyDataSetChanged();}
 
     private void hashmaptest() {
         //create test hashmap
@@ -167,4 +193,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return sharedPref.getString(prefKey, defaultValue);
     }
 
+    public void notifyProductionChange() {
+        Map<String,Double> finalProductionMap= gameState.calculateProduction();
+        for (int i = 0; i < this.resourceArrList.size(); i++) {
+            CustomResourceModel item = resourceArrList.get(i);
+            String itemName = item.getResourceName();
+            Double currentItemProduction = finalProductionMap.get(itemName);
+            item.setResourceProduction(currentItemProduction);
+            //Log.d(TAG, "notifyProductionChange: "+item.getResourceProduction());
+            notifyResourceAdapter();
+        }
+    }
 }

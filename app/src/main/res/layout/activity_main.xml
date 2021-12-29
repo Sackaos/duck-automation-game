@@ -16,6 +16,8 @@
         android:orientation="vertical"
         android:weightSum="1">
 
+
+
         <ListView
             android:id="@+id/lvResourceList"
             android:layout_width="150dp"
@@ -29,11 +31,11 @@
 
     <LinearLayout
         android:orientation="horizontal"
-        android:layout_marginTop="15dp"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="0.5"
         android:weightSum="1">
+
         <ListView
             android:id="@+id/lvFactories"
             android:layout_width="match_parent"

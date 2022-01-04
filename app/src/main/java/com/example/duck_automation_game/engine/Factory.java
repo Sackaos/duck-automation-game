@@ -17,14 +17,6 @@ public class Factory {
         this.factoryAmount=1;
     }
 
-    public Factory(String name, Map<String, Double> productionMap, Map<String, Double> costMap,int factoryAmount) {
-        this.name = name;
-        this.productionMap = productionMap;
-        this.costMap = costMap;
-        this.factoryAmount=factoryAmount;
-    }
-
-
     public void addFactoryCount() {
         this.factoryAmount = this.factoryAmount+1;
     }

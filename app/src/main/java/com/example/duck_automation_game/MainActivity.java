@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             String resourceName = resourcesList[i].getName();
             CustomResourceModel currentItem = resourceArrList.get(i);
-            Double newProduction = currentItem.getResourceProduction() + 50.015D / i;
+            Double newProduction = currentItem.getResourceProduction() + 50.015D / (i + 1);
             currentItem.setResourceProduction(newProduction);
         }
 
@@ -136,13 +136,31 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
-    public void notifyFactoryAdapter() {factoryAdapter.notifyDataSetChanged();}
+    public void notifyFactoryAdapter() {
+        factoryAdapter.notifyDataSetChanged();
+    }
+
+    public void fart() {
+        HashMap<String, Double> testHashMap = new HashMap<String, Double>();
+        testHashMap.put("lets say iron ", 0.5);
+        testHashMap.put("maybe copper!", 0.1);
+        testHashMap.put("that might be spice", 432.1);
+        testHashMap.put("or is that worm poop", 23.1);
+        testHashMap.put("IG", 0.21);
+
+        //convert to string using gson
+        Gson gson = new Gson();
+        String hashMapString = gson.toJson(testHashMap);
+    }
 
     private void hashmaptest() {
         //create test hashmap
         HashMap<String, Double> testHashMap = new HashMap<String, Double>();
-        testHashMap.put("key1", 0.5);
-        testHashMap.put("key2", 0.1);
+        testHashMap.put("lets say iron ", 0.5);
+        testHashMap.put("maybe copper!", 0.1);
+        testHashMap.put("that might be spice", 432.1);
+        testHashMap.put("or is that worm poop", 23.1);
+        testHashMap.put("IG", 0.21);
 
         //convert to string using gson
         Gson gson = new Gson();
@@ -168,9 +186,32 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onStop();
         updater.interrupt();
         //SystemClock.sleep(201);
+        saveDataToSharedPref();
+
+
+    }
+    public void saveDataToSharedPref(){
         Long date = System.currentTimeMillis();
         sharedPref.edit().putLong(LAST_TIME_LOGGED, date).apply();
+        saveResourceListToString();
+        saveFactoryListToString();
+    }
 
+    private void saveFactoryListToString() {
+        Gson gson = new Gson();
+        String factoryListString = gson.toJson(factoryList);
+        //save in shared prefs
+        sharedPref.edit().putString(PLAYER_FACTORY_PREFKEY, factoryListString).apply();
+    }
+    public ArrayList<Factory> getFactoryListFromString(String arrayString){
+
+        Gson gson = new Gson();
+        java.lang.reflect.Type type = new TypeToken<ArrayList<Factory>>() {
+        }.getType();
+        ArrayList<Factory> factoryArray = gson.fromJson(arrayString, type);
+        return factoryArray;
+    }
+    public void saveResourceListToString(){
         for (int i = 0; i < resourcesList.length; i++) {
             String currentName = resourceArrList.get(i).getResourceName();
             String currentAmount = "" + resourceArrList.get(i).getResourceAmount();
@@ -194,7 +235,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public void notifyProductionChange() {
-        Map<String,Double> finalProductionMap= gameState.calculateProduction();
+        Map<String, Double> finalProductionMap = gameState.calculateProduction();
         for (int i = 0; i < this.resourceArrList.size(); i++) {
             CustomResourceModel item = resourceArrList.get(i);
             String itemName = item.getResourceName();

@@ -19,16 +19,24 @@ public class GameState {
 
     public GameState(MainActivity main) {
         this.main = main;
-        this.resourcesNames = new String[]{"iron", "watermelons", "ducks", "pancakes", "wood", "spice melange", "rightful vengeance", "resource1", "reeeesource2", "resource3"};
+        this.resourcesNames = new String[]{"iron", "watermelons", "ducks", "pancakes", "wood", "spice melange", "rightful vengeance", "Oz Slaves", "mothers", "fuckery","MOAR RESOURCE","EVEN MOAOOAOOAOAOR"};
         this.resourcesList = new Resource[this.resourcesNames.length];
         this.resourceArrList = new ArrayList<>();
-        createStarterFactories();
+        initiateFactoryList();
         initiateResourceArrList();
-        //main.getMapFromPrefs(main.PLAYER_FACTORY_PREFKEY);
 
 
         // TODO: load the mapSize from a config file and pass it to the GameMap constructor
         this.map = new GameMap(20, resourcesList);
+
+    }
+
+    private void initiateFactoryList() {
+        String factoryListString = main.getStringFromPref(main.PLAYER_FACTORY_PREFKEY, "");
+        if (factoryListString.equals("")) createStarterFactories();
+        else {
+            factoryList = main.getFactoryListFromString(factoryListString);
+        }
 
     }
 
@@ -38,13 +46,14 @@ public class GameState {
         factoryMap.put("iron", 5D);
         HashMap<String, Double> costMap = new HashMap<>();
         costMap.put("iron", 10.0D);
-        Factory newFactory = new Factory("iron Miner", factoryMap, costMap);
+        costMap.put("watermelons", 5.0D);
+        Factory newFactory = new Factory("iron Miner", factoryMap, costMap,2);
         factoryList.add(newFactory);
 
         HashMap<String, Double> factoryMap1 = new HashMap<>();
         factoryMap1.put("iron", -2D);
         factoryMap1.put("watermelons", 1D);
-        Factory newFactory1 = new Factory("watermelon Factory", factoryMap1, costMap);
+        Factory newFactory1 = new Factory("watermelon Factory", factoryMap1, costMap,3);
         factoryList.add(newFactory1);
 
         HashMap<String, Double> factoryMap2 = new HashMap<>();
@@ -154,13 +163,7 @@ public class GameState {
         Boolean canAfford = true;
         //checks if player can afford factory
         for (String key : factory.costMap.keySet()) {
-            CustomResourceModel currentItem = null;
-            for (int j = 0; j < resourceArrList.size(); j++) {
-                if (resourceArrList.get(j).getResourceName().equals(key))
-                    currentItem = resourceArrList.get(j);
-
-            }
-
+            CustomResourceModel currentItem = findResourceByKey(key);
             if (currentItem.getResourceAmount() < factory.costMap.get(key)) {
                 canAfford = false;
             }
@@ -169,19 +172,26 @@ public class GameState {
         //makes the player pay for his factory
         if (canAfford == true) {
             for (String key : factory.costMap.keySet()) {
-                CustomResourceModel currentItem = null;
-                for (int j = 0; j < resourceArrList.size(); j++) {
-                    if (resourceArrList.get(j).getResourceName().equals(key))
-                        currentItem = resourceArrList.get(j);
-                    currentItem.setResourceAmount(currentItem.getResourceAmount() - factory.costMap.get(key));
-                }
+                CustomResourceModel currentItem = findResourceByKey(key);
+                currentItem.setResourceAmount(currentItem.getResourceAmount() - factory.costMap.get(key));
             }
 
+            factory.addFactoryCount();
+            main.notifyProductionChange();
+            main.notifyFactoryAdapter();
         }
-        factory.addFactoryCount();
-        main.notifyProductionChange();
-        main.notifyFactoryAdapter();
+    }
+
+    public CustomResourceModel findResourceByKey(String key) {
+        CustomResourceModel item = null;
+
+        for (int j = 0; j < resourceArrList.size(); j++) {
+            if (resourceArrList.get(j).getResourceName().equals(key))
+                item = resourceArrList.get(j);
+        }
+        return item;
     }
 }
+
 
 

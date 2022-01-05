@@ -1,8 +1,12 @@
 package com.example.duck_automation_game.engine;
 
+import android.graphics.Color;
 import android.util.Log;
 
+import androidx.core.content.ContextCompat;
+
 import com.example.duck_automation_game.MainActivity;
+import com.example.duck_automation_game.R;
 import com.example.duck_automation_game.ui.CustomResourceModel;
 
 import java.util.ArrayList;
@@ -19,7 +23,7 @@ public class GameState {
 
     public GameState(MainActivity main) {
         this.main = main;
-        this.resourcesNames = new String[]{"iron", "watermelons", "ducks", "pancakes", "wood", "spice melange", "rightful vengeance", "Oz Slaves", "mothers", "fuckery","MOAR RESOURCE","EVEN MOAOOAOOAOAOR"};
+        this.resourcesNames = new String[]{"iron", "watermelons", "ducks", "pancakes", "wood", "spice melange", "rightful vengeance", "Oz Slaves", "mothers", "fuckery", "MOAR RESOURCE", "EVEN MOAOOAOOAOAOR"};
         this.resourcesList = new Resource[this.resourcesNames.length];
         this.resourceArrList = new ArrayList<>();
         initiateFactoryList();
@@ -47,13 +51,13 @@ public class GameState {
         HashMap<String, Double> costMap = new HashMap<>();
         costMap.put("iron", 10.0D);
         costMap.put("watermelons", 5.0D);
-        Factory newFactory = new Factory("iron Miner", factoryMap, costMap,2);
+        Factory newFactory = new Factory("iron Miner", factoryMap, costMap, 2);
         factoryList.add(newFactory);
 
         HashMap<String, Double> factoryMap1 = new HashMap<>();
         factoryMap1.put("iron", -2D);
         factoryMap1.put("watermelons", 1D);
-        Factory newFactory1 = new Factory("watermelon Factory", factoryMap1, costMap,3);
+        Factory newFactory1 = new Factory("watermelon Factory", factoryMap1, costMap, 3);
         factoryList.add(newFactory1);
 
         HashMap<String, Double> factoryMap2 = new HashMap<>();
@@ -87,31 +91,6 @@ public class GameState {
         }
     }
 
-    public Map<String, Double> calculateProduction() {
-        //sets finalproduction map to be 0
-        Map<String, Double> finalProductionMap = new HashMap<>();
-
-        for (int i = 0; i < this.resourcesNames.length; i++) {
-            finalProductionMap.put(this.resourcesNames[i], 0.0D);
-        }
-
-
-        for (int i = 0; i < factoryList.size(); i++) {
-            //gets one factory type
-            Factory currentFactory = factoryList.get(i);
-
-            //for every resourced produced/consumed by the factory
-            for (String key : currentFactory.productionMap.keySet()) {
-                Double currentProduction = finalProductionMap.get(key);
-                Double newProduction = currentProduction + (currentFactory.productionMap.get(key) * currentFactory.getFactoryAmount());
-                finalProductionMap.put(key, newProduction);
-            }
-        }
-        return finalProductionMap;
-
-    }
-
-
     /**
      * update the gameState per seconds
      *
@@ -144,6 +123,45 @@ public class GameState {
 
     }
 
+    public Map<String, Double> calculateProduction() {
+        //sets finalproduction map to be 0
+        Map<String, Double> finalProductionMap = new HashMap<>();
+
+        for (int i = 0; i < this.resourcesNames.length; i++) {
+            finalProductionMap.put(this.resourcesNames[i], 0.0D);
+        }
+
+
+        for (int i = 0; i < factoryList.size(); i++) {
+            //gets one factory type
+            Factory currentFactory = factoryList.get(i);
+
+            //for every resourced produced/consumed by the factory
+            for (String key : currentFactory.productionMap.keySet()) {
+                Double currentProduction = finalProductionMap.get(key);
+                Double newProduction = currentProduction + (currentFactory.productionMap.get(key) * currentFactory.getFactoryAmount());
+                finalProductionMap.put(key, newProduction);
+            }
+
+        }
+
+        for (String bigkey : finalProductionMap.keySet()) {
+            if (finalProductionMap.get(bigkey) < 0) {
+                for (String key : finalProductionMap.keySet()) {
+                    finalProductionMap.put(key, 0.0D);
+                }
+                main.setSellbtnColor(R.color.btnSell);
+
+                break;
+            }
+            else try{ main.setSellbtnColor(R.color.purple_500);}
+            catch (Exception e){
+                Log.e("GAD", "calculateProduction: "+e.getMessage());
+            }
+        }
+        return finalProductionMap;
+    }
+
 
     public ArrayList<Factory> getPlayerfactories() {
         return this.factoryList;
@@ -158,7 +176,17 @@ public class GameState {
         return this.resourceArrList;
     }
 
-    public void BuildFactory(int i) {
+    public CustomResourceModel findResourceByKey(String key) {
+        CustomResourceModel item = null;
+
+        for (int j = 0; j < resourceArrList.size(); j++) {
+            if (resourceArrList.get(j).getResourceName().equals(key))
+                item = resourceArrList.get(j);
+        }
+        return item;
+    }
+
+    public void buildFactory(int i) {
         Factory factory = factoryList.get(i);
         Boolean canAfford = true;
         //checks if player can afford factory
@@ -166,6 +194,7 @@ public class GameState {
             CustomResourceModel currentItem = findResourceByKey(key);
             if (currentItem.getResourceAmount() < factory.costMap.get(key)) {
                 canAfford = false;
+                break;
             }
         }
 
@@ -177,19 +206,25 @@ public class GameState {
             }
 
             factory.addFactoryCount();
-            main.notifyProductionChange();
             main.notifyFactoryAdapter();
+            main.notifyProductionChange();
         }
+        else main.showToast("cant afford");
     }
 
-    public CustomResourceModel findResourceByKey(String key) {
-        CustomResourceModel item = null;
+    public void sellFactory(int i) {
+        Factory factory = factoryList.get(i);
+        if (factory.getFactoryAmount() > 0) {
+            factory.destroyFactory();
+            for (String key : factory.costMap.keySet()) {
+                CustomResourceModel resource = findResourceByKey(key);
+                resource.setResourceAmount(resource.getResourceAmount() + factory.costMap.get(key));
+            }
+            main.notifyProductionChange();
+            main.notifyFactoryAdapter();
+        } else main.showToast("cant sell; not enough factories");
 
-        for (int j = 0; j < resourceArrList.size(); j++) {
-            if (resourceArrList.get(j).getResourceName().equals(key))
-                item = resourceArrList.get(j);
-        }
-        return item;
+
     }
 }
 

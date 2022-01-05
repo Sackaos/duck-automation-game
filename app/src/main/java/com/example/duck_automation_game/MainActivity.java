@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void createFactoryAdapter() {
-        factoryAdapter = new CustomFactoryListAdapter(this, 0, 0, gameState.getPlayerfactories());
+        factoryAdapter = new CustomFactoryListAdapter(this, 0, 0, gameState.getPlayerfactories(), gameState);
         ListView lvFactories = (ListView) findViewById(R.id.lvFactories);
         lvFactories.setOnItemClickListener(this);
         lvFactories.setAdapter(factoryAdapter);
@@ -106,9 +106,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
 
         if (adapterView.getAdapter() instanceof CustomFactoryListAdapter) {
-            Log.d(TAG, "onItemClick: ITS REALLY WROKING  " + factoryList.get(i).getFactoryName());
-
-            gameState.BuildFactory(i);
+            Log.d(TAG, "onItemClick: " + factoryList.get(i).getFactoryName());
 
 
         }
@@ -140,17 +138,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         factoryAdapter.notifyDataSetChanged();
     }
 
-    public void fart() {
-        HashMap<String, Double> testHashMap = new HashMap<String, Double>();
-        testHashMap.put("lets say iron ", 0.5);
-        testHashMap.put("maybe copper!", 0.1);
-        testHashMap.put("that might be spice", 432.1);
-        testHashMap.put("or is that worm poop", 23.1);
-        testHashMap.put("IG", 0.21);
-
-        //convert to string using gson
-        Gson gson = new Gson();
-        String hashMapString = gson.toJson(testHashMap);
+    public void showToast(String text) {
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
 
     private void hashmaptest() {
@@ -190,7 +179,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
     }
-    public void saveDataToSharedPref(){
+
+    public void saveDataToSharedPref() {
         Long date = System.currentTimeMillis();
         sharedPref.edit().putLong(LAST_TIME_LOGGED, date).apply();
         saveResourceListToString();
@@ -203,7 +193,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //save in shared prefs
         sharedPref.edit().putString(PLAYER_FACTORY_PREFKEY, factoryListString).apply();
     }
-    public ArrayList<Factory> getFactoryListFromString(String arrayString){
+
+    public ArrayList<Factory> getFactoryListFromString(String arrayString) {
 
         Gson gson = new Gson();
         java.lang.reflect.Type type = new TypeToken<ArrayList<Factory>>() {
@@ -211,7 +202,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         ArrayList<Factory> factoryArray = gson.fromJson(arrayString, type);
         return factoryArray;
     }
-    public void saveResourceListToString(){
+
+    public void saveResourceListToString() {
         for (int i = 0; i < resourcesList.length; i++) {
             String currentName = resourceArrList.get(i).getResourceName();
             String currentAmount = "" + resourceArrList.get(i).getResourceAmount();
@@ -238,11 +230,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Map<String, Double> finalProductionMap = gameState.calculateProduction();
         for (int i = 0; i < this.resourceArrList.size(); i++) {
             CustomResourceModel item = resourceArrList.get(i);
+
             String itemName = item.getResourceName();
             Double currentItemProduction = finalProductionMap.get(itemName);
+
             item.setResourceProduction(currentItemProduction);
-            //Log.d(TAG, "notifyProductionChange: "+item.getResourceProduction());
             notifyResourceAdapter();
         }
+    }
+
+    public void setSellbtnColor(int color) {
+        factoryAdapter.setSellbtnColor(color);
+        notifyFactoryAdapter();
     }
 }

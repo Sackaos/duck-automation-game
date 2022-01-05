@@ -1,6 +1,7 @@
 package com.example.duck_automation_game.engine;
 
 import android.util.Log;
+import android.widget.Button;
 
 import java.util.Map;
 
@@ -9,7 +10,7 @@ public class Factory {
     Map<String, Double> productionMap;
     Map<String, Double> costMap;
     int factoryAmount;
-
+    Button btnBuy;
     public Factory(String name, Map<String, Double> productionMap, Map<String, Double> costMap) {
         this.name = name;
         this.productionMap = productionMap;
@@ -48,4 +49,6 @@ public class Factory {
     public int getFactoryAmount() {
         return this.factoryAmount;
     }
+
+    public void destroyFactory(){this.factoryAmount=this.factoryAmount-1;}
 }

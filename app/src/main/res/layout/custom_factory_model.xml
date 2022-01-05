@@ -2,62 +2,82 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="200dp"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    >
-
+    android:orientation="vertical">
 
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_weight="0.6"
-        android:weightSum="1"
-        >
+        android:orientation="horizontal"
+        android:weightSum="1">
+
         <LinearLayout
-            android:weightSum="1"
-            android:layout_weight="0.60"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_weight="0.60"
+            android:orientation="vertical"
+            android:weightSum="1">
 
             <TextView
-                android:textSize="12sp"
                 android:id="@+id/tvFactoryName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="3dp"
                 android:text="Factory"
-                android:textColor="@color/beige" />
+                android:textColor="@color/beige"
+                android:textSize="12sp" />
 
             <TextView
-            android:textSize="12sp"
-            android:id="@+id/tvFactoryCost"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="3dp"
-            android:textColor="@color/gray"
-            android:text="Cost"
-            />
-         </LinearLayout>
+                android:id="@+id/tvFactoryCost"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="3dp"
+                android:text="Cost"
+                android:textColor="@color/gray"
+                android:textSize="12sp" />
+        </LinearLayout>
 
-    <LinearLayout
-        android:layout_weight="0.40"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-        <TextView
-            android:textSize="12sp"
-            android:id="@+id/tvFactoryAmount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="3dp"
-            android:textColor="@color/gray"
-            android:text="Amount"
-            />
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.40"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvFactoryAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="3dp"
+                android:text="Amount"
+                android:textColor="@color/gray"
+                android:textSize="12sp" />
 
 
         </LinearLayout>
     </LinearLayout>
+
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:orientation="horizontal"
+            android:layout_marginLeft="45dp">
+
+            <Button
+                android:id="@+id/btnBuy"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:text="buy"
+                android:textSize="7sp"></Button>
+
+            <Button
+                android:id="@+id/btnSell"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:text="sell"
+                android:textSize="7sp"></Button>
+        </LinearLayout>
 
 </LinearLayout>

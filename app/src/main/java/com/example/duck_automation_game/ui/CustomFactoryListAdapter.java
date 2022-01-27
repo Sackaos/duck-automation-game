@@ -54,7 +54,9 @@ public class CustomFactoryListAdapter extends ArrayAdapter<Factory> {
         Map<String, Double> costMap = temp.getCostMap();
         String costText = "";
         for (String key : costMap.keySet()) {
-            String str = key + ": " + costMap.get(key);
+            Double currentFactoryCost=costMap.get(key)*(temp.getFactoryAmount()*1.5);
+
+            String str = key + ": " + currentFactoryCost;
             costText = costText + "\n" + str;
         }
         tvFactoryCost.setText(costText);

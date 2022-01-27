@@ -23,7 +23,7 @@ public class GameState {
 
     public GameState(MainActivity main) {
         this.main = main;
-        this.resourcesNames = new String[]{"iron", "watermelons", "ducks", "pancakes", "wood", "spice melange", "rightful vengeance", "Oz Slaves", "mothers", "fuckery", "MOAR RESOURCE", "EVEN MOAOOAOOAOAOR"};
+        this.resourcesNames = new String[]{"iron", "watermelons", "ducks", "pancakes", "wood", "spice melange", "rightful vengeance", "Oz Slaves", "cough", "cough 2 ", "MOAR RESOURCE", "EVEN MOAOOAOOAOAOR"};
         this.resourcesList = new Resource[this.resourcesNames.length];
         this.resourceArrList = new ArrayList<>();
         initiateFactoryList();
@@ -191,8 +191,9 @@ public class GameState {
         Boolean canAfford = true;
         //checks if player can afford factory
         for (String key : factory.costMap.keySet()) {
+            Double currentFactoryCost=factory.costMap.get(key)*(factory.getFactoryAmount()*1.5);
             CustomResourceModel currentItem = findResourceByKey(key);
-            if (currentItem.getResourceAmount() < factory.costMap.get(key)) {
+            if (currentItem.getResourceAmount() < currentFactoryCost) {
                 canAfford = false;
                 break;
             }
@@ -202,7 +203,8 @@ public class GameState {
         if (canAfford == true) {
             for (String key : factory.costMap.keySet()) {
                 CustomResourceModel currentItem = findResourceByKey(key);
-                currentItem.setResourceAmount(currentItem.getResourceAmount() - factory.costMap.get(key));
+                Double currentFactoryCost=factory.costMap.get(key)*(factory.getFactoryAmount()*1.5);
+                currentItem.setResourceAmount(currentItem.getResourceAmount() - currentFactoryCost);
             }
 
             factory.addFactoryCount();

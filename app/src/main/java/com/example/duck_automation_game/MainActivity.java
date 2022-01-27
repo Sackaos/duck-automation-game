@@ -3,6 +3,7 @@ package com.example.duck_automation_game;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,6 +22,7 @@ import com.example.duck_automation_game.engine.Update;
 import com.example.duck_automation_game.ui.CustomFactoryListAdapter;
 import com.example.duck_automation_game.ui.CustomResourceListAdapter;
 import com.example.duck_automation_game.ui.CustomResourceModel;
+import com.example.duck_automation_game.ui.MapsActivity;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -242,5 +244,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void setSellbtnColor(int color) {
         factoryAdapter.setSellbtnColor(color);
         notifyFactoryAdapter();
+    }
+    public void changeToMapActivity(){
+        Intent intent = new Intent();
+        startActivity(intent, MapsActivity);
     }
 }

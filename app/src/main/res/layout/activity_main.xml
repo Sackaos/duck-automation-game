@@ -15,7 +15,12 @@
         android:layout_weight="0.5"
         android:orientation="vertical"
         android:weightSum="1">
-
+<Button
+    android:layout_width="150dp"
+    android:layout_height="50dp"
+    android:text="button"
+    android:onClick="changeToMapActivity"
+    />
         <ListView
             android:id="@+id/lvResourceList"
             android:layout_width="150dp"
@@ -34,11 +39,15 @@
         android:layout_height="match_parent"
         android:layout_weight="0.5"
         android:weightSum="1">
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.1"
         <ListView
             android:id="@+id/lvFactories"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-
+            android:layout_height="0dp"
+            android:layout_weight="0.1"
             android:divider="@color/material_blue_grey_800"
             android:dividerHeight="1dp"
             android:footerDividersEnabled="false" />

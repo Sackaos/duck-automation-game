@@ -10,6 +10,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Duckautomationgame">
         <activity
+            android:name=".ui.MapsActivity"
+            android:exported="false" />
+        <activity
             android:name=".MapActivity"
             android:exported="false" />
         <activity
@@ -21,6 +24,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <meta-data
+            android:name="com.google.android.geo.AIzaSyDxVteKkUElg4fahpWzyD83j7Ykh9OkdMU"
+            android:value="AIzaSyDxVteKkUElg4fahpWzyD83j7Ykh9OkdMU" />
     </application>
 
 </manifest>

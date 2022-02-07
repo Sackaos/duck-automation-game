@@ -7,9 +7,11 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="beige">#EDA150</color>
-    <color name="gray">#BCBCBC</color>
+    <color name="beige">#F9C73F</color>
+    <color name="gary">#BCBCBC</color>
     <color name="blue">#006ED9</color>
-    <color name="btnSell">#80700099</color>
+    <color name="btnSell">#FFD369EE</color>
+    <color name="btnSell2">#FFFFFF</color>
+    <color name="mainBG">#383838</color>
 
 </resources>

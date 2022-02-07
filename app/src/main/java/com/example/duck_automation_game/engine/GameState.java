@@ -154,7 +154,7 @@ public class GameState {
 
                 break;
             }
-            else try{ main.setSellbtnColor(R.color.purple_500);}
+            else try{ main.setSellbtnColor(R.color.btnSell2);}
             catch (Exception e){
                 Log.e("GAD", "calculateProduction: "+e.getMessage());
             }

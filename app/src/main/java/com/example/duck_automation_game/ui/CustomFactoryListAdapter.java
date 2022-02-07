@@ -27,13 +27,13 @@ public class CustomFactoryListAdapter extends ArrayAdapter<Factory> {
     Context context;
     List<Factory> objects;
     GameState gameState;
-    int sellbtnColor=R.color.purple_200;
+    int sellbtnColor = R.color.purple_200;
 
     public CustomFactoryListAdapter(Context context, int resource, int textViewResourceId, ArrayList<Factory> factoryList, GameState gameState) {
         super(context, resource, textViewResourceId, factoryList);
         this.context = context;
         this.objects = factoryList;
-        this.gameState=gameState;
+        this.gameState = gameState;
     }
 
     @SuppressLint("ResourceAsColor")
@@ -45,25 +45,33 @@ public class CustomFactoryListAdapter extends ArrayAdapter<Factory> {
         TextView tvFactoryName = (TextView) view.findViewById(R.id.tvFactoryName);
         TextView tvFactoryCost = (TextView) view.findViewById(R.id.tvFactoryCost);
         TextView tvFactoryAmount = (TextView) view.findViewById(R.id.tvFactoryAmount);
-        Button btnFactoryBuy= (Button) view.findViewById(R.id.btnBuy);
-        Button btnFactorySell= (Button) view.findViewById(R.id.btnSell);
-
+        TextView tvFactoryProduction = (TextView)view.findViewById(R.id.tvFactoryProduction);
+        Button btnFactoryBuy = (Button) view.findViewById(R.id.btnBuy);
+        Button btnFactorySell = (Button) view.findViewById(R.id.btnSell);
         Factory temp = objects.get(position);
 
         tvFactoryName.setText(temp.getFactoryName());
         Map<String, Double> costMap = temp.getCostMap();
+        Map<String, Double> prodMap = temp.getProductionMap();
         String costText = "";
+        String prodText="";
         for (String key : costMap.keySet()) {
-            Double currentFactoryCost=costMap.get(key)*(temp.getFactoryAmount()*1.5);
-
+            Double currentFactoryCost = costMap.get(key) * (temp.getFactoryAmount() * 1.5);
             String str = key + ": " + currentFactoryCost;
             costText = costText + "\n" + str;
         }
+        for (String key : prodMap.keySet()) {
+            Double currentFactoryProd = prodMap.get(key);
+            String str = key + ": " + currentFactoryProd;
+            prodText = prodText + "\n" + str;
+        }
         tvFactoryCost.setText(costText);
-        tvFactoryAmount.setText(String.valueOf(temp.getFactoryAmount()));
+        tvFactoryProduction.setText(prodText);
+        tvFactoryAmount.setText("Amount: " + String.valueOf(temp.getFactoryAmount()));
         btnFactoryBuy.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) { gameState.buildFactory(position);
+            public void onClick(View view) {
+                gameState.buildFactory(position);
             }
         });
         btnFactorySell.setOnClickListener(new View.OnClickListener() {
@@ -79,7 +87,7 @@ public class CustomFactoryListAdapter extends ArrayAdapter<Factory> {
     }
 
     public void setSellbtnColor(int color) {
-        this.sellbtnColor=ContextCompat.getColor(getContext(),color);
+        this.sellbtnColor = ContextCompat.getColor(getContext(), color);
     }
 
 }

@@ -245,8 +245,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         factoryAdapter.setSellbtnColor(color);
         notifyFactoryAdapter();
     }
-    public void changeToMapActivity(){
-        Intent intent = new Intent();
-        startActivity(intent, MapsActivity);
+    public void changeToMapActivity(View view){
+        Intent intent = new Intent(this,MapsActivity.class);
+        startActivity(intent);
     }
 }

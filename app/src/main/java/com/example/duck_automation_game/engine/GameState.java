@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat;
 import com.example.duck_automation_game.MainActivity;
 import com.example.duck_automation_game.R;
 import com.example.duck_automation_game.ui.CustomResourceModel;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,6 +21,7 @@ public class GameState {
     ArrayList<CustomResourceModel> resourceArrList;
     String[] resourcesNames;
     MainActivity main;
+    private Factory lastBuiltFactory;
 
     public GameState(MainActivity main) {
         this.main = main;
@@ -153,10 +155,10 @@ public class GameState {
                 main.setSellbtnColor(R.color.btnSell);
 
                 break;
-            }
-            else try{ main.setSellbtnColor(R.color.btnSell2);}
-            catch (Exception e){
-                Log.e("GAD", "calculateProduction: "+e.getMessage());
+            } else try {
+                main.setSellbtnColor(R.color.btnSell2);
+            } catch (Exception e) {
+                Log.e("GAD", "calculateProduction: " + e.getMessage());
             }
         }
         return finalProductionMap;
@@ -191,7 +193,7 @@ public class GameState {
         Boolean canAfford = true;
         //checks if player can afford factory
         for (String key : factory.costMap.keySet()) {
-            Double currentFactoryCost=factory.costMap.get(key)*(factory.getFactoryAmount()*1.5);
+            Double currentFactoryCost = factory.costMap.get(key) * (factory.getFactoryAmount() * 1.5);
             CustomResourceModel currentItem = findResourceByKey(key);
             if (currentItem.getResourceAmount() < currentFactoryCost) {
                 canAfford = false;
@@ -201,17 +203,18 @@ public class GameState {
 
         //makes the player pay for his factory
         if (canAfford == true) {
+            main.changeToMapActivity(true);
+
             for (String key : factory.costMap.keySet()) {
                 CustomResourceModel currentItem = findResourceByKey(key);
-                Double currentFactoryCost=factory.costMap.get(key)*(factory.getFactoryAmount()*1.5);
+                Double currentFactoryCost = factory.costMap.get(key) * (factory.getFactoryAmount() * 1.5);
                 currentItem.setResourceAmount(currentItem.getResourceAmount() - currentFactoryCost);
             }
-
-            factory.addFactoryCount();
+            lastBuiltFactory = factory;
+            factory.addFactoryCount(+1);
             main.notifyFactoryAdapter();
             main.notifyProductionChange();
-        }
-        else main.showToast("cant afford");
+        } else main.showToast("cant afford 😢");
     }
 
     public void sellFactory(int i) {
@@ -227,6 +230,14 @@ public class GameState {
         } else main.showToast("cant sell; not enough factories");
 
 
+    }
+
+    public void destroyLastFactory() {
+        lastBuiltFactory.addFactoryCount(-1);
+    }
+
+    public void setLastFactoryPos(LatLng pos) {
+        lastBuiltFactory.setPosition(pos);
     }
 }
 

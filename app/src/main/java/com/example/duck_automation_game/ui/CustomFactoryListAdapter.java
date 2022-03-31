@@ -86,7 +86,7 @@ public class CustomFactoryListAdapter extends ArrayAdapter<Factory> {
         return view;
     }
 
-    public void setSellbtnColor(int color) {
+    public void setSellbtnColor(int color){
         this.sellbtnColor = ContextCompat.getColor(getContext(), color);
     }
 

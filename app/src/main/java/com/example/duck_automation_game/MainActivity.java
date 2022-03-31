@@ -1,8 +1,10 @@
 package com.example.duck_automation_game;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -12,6 +14,7 @@ import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -23,6 +26,7 @@ import com.example.duck_automation_game.ui.CustomFactoryListAdapter;
 import com.example.duck_automation_game.ui.CustomResourceListAdapter;
 import com.example.duck_automation_game.ui.CustomResourceModel;
 import com.example.duck_automation_game.ui.MapsActivity;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -31,6 +35,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+    private static final int MAP_ACTIVITY_RESULT_CODE = 15;
     GameState gameState;
     Resource[] resourcesList;
     CustomResourceListAdapter resourceAdapter;
@@ -55,8 +60,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         factoryList = gameState.getPlayerfactories();
         createFactoryAdapter();
         initiateUpdater(this);
+        setOnClicks();
         Log.d(TAG, "on create: completed");
     }
+
 
     private void initiateUpdater(MainActivity main) {
         Long lastLogin = sharedPref.getLong(LAST_TIME_LOGGED, System.currentTimeMillis());
@@ -95,12 +102,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
+    private void setOnClicks() {
+        Button mapBtn = findViewById(R.id.btn_Map);
+        mapBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeToMapActivity(false);
+            }
+        });
+    }
 
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
         if (adapterView.getAdapter() instanceof CustomResourceListAdapter) {
             Log.d(TAG, "onItemClick: ITS WROKING");
-
             String resourceName = resourcesList[i].getName();
             CustomResourceModel currentItem = resourceArrList.get(i);
             Double newProduction = currentItem.getResourceProduction() + 50.015D / (i + 1);
@@ -109,7 +124,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         if (adapterView.getAdapter() instanceof CustomFactoryListAdapter) {
             Log.d(TAG, "onItemClick: " + factoryList.get(i).getFactoryName());
-
 
         }
 
@@ -245,8 +259,42 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         factoryAdapter.setSellbtnColor(color);
         notifyFactoryAdapter();
     }
-    public void changeToMapActivity(View view){
-        Intent intent = new Intent(this,MapsActivity.class);
-        startActivity(intent);
+
+
+    public void changeToMapActivity(Boolean canClick) {
+
+        Intent intent = new Intent(this, com.example.duck_automation_game.ui.MapsActivity.class);
+        intent.putExtra("canClick", canClick);
+
+
+        if (canClick == true) startActivityForResult(intent, MAP_ACTIVITY_RESULT_CODE);
+        else startActivity(intent);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == MAP_ACTIVITY_RESULT_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                Boolean didBuy = data.getBooleanExtra("did_buy", returnFalse());
+                if (didBuy) {
+                    LatLng pos = data.getParcelableExtra("factory_postion");
+                    gameState.setLastFactoryPos(pos);
+                } else gameState.destroyLastFactory();
+            }
+
+            if (resultCode == Activity.RESULT_CANCELED) {
+                // Write your code if there's no result
+
+                showToast("you came back from the dead didnt you");
+            }
+        }
+    }
+
+    private boolean returnFalse() {
+        showToast("SOMETHING WRONG HAPPENED-on activity result-");
+        Log.e("GAD", "returnFalse: THIS SHOULD NOT HAVE BEEN CALLED");
+        return false;
     }
 }

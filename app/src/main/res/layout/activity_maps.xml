@@ -4,12 +4,52 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/beige"
+    android:orientation="vertical"
     tools:context=".ui.MapsActivity">
 
     <com.google.android.gms.maps.MapView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
         android:id="@+id/mvMaps"
-        />
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.8" />
+
+    <LinearLayout
+        android:id="@+id/ly_mapsLower"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight=".2"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="are you sure you want to build this factory ?"
+            android:gravity="center"
+            android:textSize="50px"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.2"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_factoryAccept"
+                android:layout_width="120dp"
+                android:layout_height="50dp"
+                android:layout_margin="50dp"
+                android:text="Accept"
+                android:layout_gravity="center"/>
+
+            <Button
+                android:id="@+id/btn_factoryDeny"
+                android:layout_width="120dp"
+                android:layout_height="50dp"
+                android:text="cancel"
+                android:layout_gravity="center"/>
+        </LinearLayout>
+    </LinearLayout>
 
 </LinearLayout>

@@ -1,10 +1,11 @@
 package com.example.duck_automation_game;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -15,7 +16,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.example.duck_automation_game.engine.Factory;
@@ -25,7 +28,6 @@ import com.example.duck_automation_game.engine.Update;
 import com.example.duck_automation_game.ui.CustomFactoryListAdapter;
 import com.example.duck_automation_game.ui.CustomResourceListAdapter;
 import com.example.duck_automation_game.ui.CustomResourceModel;
-import com.example.duck_automation_game.ui.MapsActivity;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -47,6 +49,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public String PLAYER_FACTORY_PREFKEY = "factoryprefkey";
     public String LAST_TIME_LOGGED = "dateprefkey";
     String TAG = "GAD";
+    Boolean powerSavingMode = false;
+    AlertDialog.Builder builder;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,16 +64,28 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         createResourceAdapter();
         factoryList = gameState.getPlayerfactories();
         createFactoryAdapter();
-        initiateUpdater(this);
+        initiateUpdater();
+        builder = new AlertDialog.Builder(this);
         setOnClicks();
         Log.d(TAG, "on create: completed");
+
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initiateUpdater();
+    }
 
-    private void initiateUpdater(MainActivity main) {
+    private void initiateUpdater() {
         Long lastLogin = sharedPref.getLong(LAST_TIME_LOGGED, System.currentTimeMillis());
         Long timeSinceLastLogin = (System.currentTimeMillis() - lastLogin) / 1000;
         gameState.update(timeSinceLastLogin);
+        newUpdater();
+
+    }
+
+    private void newUpdater() {
         Handler h = new Handler(Looper.myLooper()) {
             @Override
             public void handleMessage(@NonNull Message msg) {
@@ -76,13 +93,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 notifyResourceAdapter();
             }
         };
-        updater = new Update(h, gameState, this);
+        Double updateTime;
+        if (powerSavingMode == true) updateTime = 1D;
+        else updateTime = 0.2D;
+        if (updater != null) {
+            updater.interrupt();
+        }
+        updater = new Update(h, gameState, this, updateTime);
         updater.start();
     }
 
+    //####################UI stuff#########################
     private void createFactoryAdapter() {
         factoryAdapter = new CustomFactoryListAdapter(this, 0, 0, gameState.getPlayerfactories(), gameState);
-        ListView lvFactories = (ListView) findViewById(R.id.lvFactories);
+        ListView lvFactories = (ListView) findViewById(R.id.lv_Factories);
         lvFactories.setOnItemClickListener(this);
         lvFactories.setAdapter(factoryAdapter);
 
@@ -90,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public void createResourceAdapter() {
         resourceAdapter = new CustomResourceListAdapter(this, 0, 0, resourceArrList);
-        ListView lvResources = (ListView) findViewById(R.id.lvResourceList);
+        ListView lvResources = (ListView) findViewById(R.id.lv_ResourceList);
         lvResources.setOnItemClickListener(this);
         lvResources.setAdapter(resourceAdapter);
 
@@ -110,16 +134,87 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 changeToMapActivity(false);
             }
         });
+
+        View.OnClickListener my = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showLayoutMenu(R.id.ly_MainMenu);
+            }
+        };
+
+        Button backBtnSettings = findViewById(R.id.btn_Settings_Back);
+        backBtnSettings.setOnClickListener(my);
+
+        Button settingsBtn = findViewById(R.id.btn_Settings);
+        settingsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showLayoutMenu(R.id.ly_Settings);
+            }
+        });
+
+        Switch powerSavingSwitch = findViewById(R.id.switch_Settings_Power);
+        powerSavingSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                powerSavingMode = powerSavingSwitch.isActivated();
+                newUpdater();
+            }
+        });
+
+        Button exitBtn = findViewById(R.id.btn_Exit);
+        exitBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                builder.setMessage("Do you want to close this application ?")
+                        .setCancelable(false)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                finish();
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                                showToast("phew");
+                            }
+                        }).setTitle("Exit Tialoge");
+                //Creating dialog box
+                AlertDialog alert = builder.create();
+                alert.show();
+            }
+        });
+    }
+
+
+    private void showLayoutMenu(int layoutID) {
+        LinearLayout newLayout = findViewById(layoutID);
+        LinearLayout oldLayout = findViewById(R.id.ly_MainMenu);
+
+        oldLayout.setLayoutParams(getDefaultLayoutParamsWithWeight(0f));
+        newLayout.setLayoutParams(getDefaultLayoutParamsWithWeight(0.4f));
+
+    }
+
+    private LinearLayout.LayoutParams getDefaultLayoutParamsWithWeight(float weight) {
+        return new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                0,
+                weight
+        );
     }
 
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
         if (adapterView.getAdapter() instanceof CustomResourceListAdapter) {
-            Log.d(TAG, "onItemClick: ITS WROKING");
             String resourceName = resourcesList[i].getName();
-            CustomResourceModel currentItem = resourceArrList.get(i);
-            Double newProduction = currentItem.getResourceProduction() + 50.015D / (i + 1);
-            currentItem.setResourceProduction(newProduction);
+            if (resourceName.equals("iron") || resourceName.equals("watermelons")) {
+                Log.d(TAG, "onItemClick: resource clicked");
+                CustomResourceModel currentItem = resourceArrList.get(i);
+                Double newAmount = currentItem.getResourceAmount() + 1D;
+                currentItem.setResourceAmount(newAmount);
+
+            }
         }
 
         if (adapterView.getAdapter() instanceof CustomFactoryListAdapter) {
@@ -157,6 +252,60 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void showToast(String text) {
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
+
+    public void notifyProductionChange() {
+        Map<String, Double> finalProductionMap = gameState.calculateProduction();
+        for (int i = 0; i < this.resourceArrList.size(); i++) {
+            CustomResourceModel item = resourceArrList.get(i);
+
+            String itemName = item.getResourceName();
+            Double currentItemProduction = finalProductionMap.get(itemName);
+
+            item.setResourceProduction(currentItemProduction);
+            notifyResourceAdapter();
+        }
+    }
+
+
+//####################...Activities Stuff?#########################
+
+
+    public void changeToMapActivity(Boolean canClick) {
+
+        Intent intent = new Intent(this, com.example.duck_automation_game.ui.MapsActivity.class);
+        intent.putExtra("canClick", canClick);
+
+
+        if (canClick == true) startActivityForResult(intent, MAP_ACTIVITY_RESULT_CODE);
+        else startActivity(intent);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == MAP_ACTIVITY_RESULT_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                if (!data.hasExtra("did_buy"))
+                    showToast("something wrong happened -on activity result-");
+
+                Boolean didBuy = data.getBooleanExtra("did_buy", false);
+                if (didBuy) {
+                    LatLng pos = data.getParcelableExtra("factory_postion");
+                    gameState.setLastFactoryPos(pos);
+                } else gameState.destroyLastFactory();
+            }
+
+            if (resultCode == Activity.RESULT_CANCELED) {
+                // Write your code if there's no result
+
+                showToast("you came back from the dead didnt you");
+                changeToMapActivity(true);
+            }
+        }
+    }
+
+//####################Saving  Stuff#########################
 
     private void hashmaptest() {
         //create test hashmap
@@ -242,59 +391,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return sharedPref.getString(prefKey, defaultValue);
     }
 
-    public void notifyProductionChange() {
-        Map<String, Double> finalProductionMap = gameState.calculateProduction();
-        for (int i = 0; i < this.resourceArrList.size(); i++) {
-            CustomResourceModel item = resourceArrList.get(i);
+    //####################Menues stuff#########################
 
-            String itemName = item.getResourceName();
-            Double currentItemProduction = finalProductionMap.get(itemName);
-
-            item.setResourceProduction(currentItemProduction);
-            notifyResourceAdapter();
-        }
-    }
-
-    public void setSellbtnColor(int color) {
-        factoryAdapter.setSellbtnColor(color);
-        notifyFactoryAdapter();
-    }
-
-
-    public void changeToMapActivity(Boolean canClick) {
-
-        Intent intent = new Intent(this, com.example.duck_automation_game.ui.MapsActivity.class);
-        intent.putExtra("canClick", canClick);
-
-
-        if (canClick == true) startActivityForResult(intent, MAP_ACTIVITY_RESULT_CODE);
-        else startActivity(intent);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == MAP_ACTIVITY_RESULT_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-                Boolean didBuy = data.getBooleanExtra("did_buy", returnFalse());
-                if (didBuy) {
-                    LatLng pos = data.getParcelableExtra("factory_postion");
-                    gameState.setLastFactoryPos(pos);
-                } else gameState.destroyLastFactory();
-            }
-
-            if (resultCode == Activity.RESULT_CANCELED) {
-                // Write your code if there's no result
-
-                showToast("you came back from the dead didnt you");
-            }
-        }
-    }
-
-    private boolean returnFalse() {
-        showToast("SOMETHING WRONG HAPPENED-on activity result-");
-        Log.e("GAD", "returnFalse: THIS SHOULD NOT HAVE BEEN CALLED");
-        return false;
-    }
 }

@@ -73,7 +73,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mvMap.onCreate(null);
         bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(resizeMapIcons("factory_icon2", 200, 200));
         mvMap.getMapAsync(this);
-        canClick = getIntent().getBooleanExtra("key", false);
+        canClick = getIntent().getBooleanExtra("canClick", false);
         lyLower = findViewById(R.id.ly_mapsLower);
         lyGone();
         setOnClicks();
@@ -84,13 +84,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                canClick = false;
                 lyGone();
                 Intent returnIntent = new Intent();
-                returnIntent.putExtra("did_buy",true);
-                LatLng factoryPosition = markerList.get(markerList.size()-1).getPosition();
-                returnIntent.putExtra("factory_position",factoryPosition);
-                setResult(Activity.RESULT_OK,returnIntent);
+                returnIntent.putExtra("did_buy", true);
+                LatLng factoryPosition = markerList.get(markerList.size() - 1).getPosition();
+                returnIntent.putExtra("factory_position", factoryPosition);
+                setResult(Activity.RESULT_OK, returnIntent);
                 finish();
             }
         });
@@ -100,12 +99,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onClick(View view) {
                 canClick = true;
                 lyGone();
-                markerList.get(markerList.size()-1).remove();
-                markerList.remove(markerList.size()-1);
+                markerList.get(markerList.size() - 1).remove();
+                markerList.remove(markerList.size() - 1);
 
                 Intent returnIntent = new Intent();
-                returnIntent.putExtra("did_buy",false);
-                setResult(Activity.RESULT_OK,returnIntent);
+                returnIntent.putExtra("did_buy", false);
+                setResult(Activity.RESULT_OK, returnIntent);
                 finish();
 
 
@@ -151,7 +150,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public ArrayList<Marker> getMarkerListFromPref() {
         String customMarkerListString = getStringFromPref(CUSTOM_MARKERLIST_PREFKEY, "");
-            if (!customMarkerListString.equals("")) {
+        if (!customMarkerListString.equals("")) {
             Gson gson = new Gson();
             java.lang.reflect.Type type = new TypeToken<ArrayList<CustomMarker>>() {
             }.getType();
@@ -203,20 +202,26 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onMapClick(LatLng latLng) {
                 if (canClick) {
-
-                    MarkerOptions markerOptions = new MarkerOptions()
-                            .position(latLng)
-                            .title("YAHOO BING GIIGLE")
-                            .snippet("this is a description string")
-                            .icon(bitmapDescriptor);
-                    Marker a = map.addMarker(markerOptions);
-                    a.setTag(bitmapDescriptor);
-                    markerList.add(a);
-                    lyShow();
+                    Boolean isOK = true;
+                    for (Marker marker : markerList) {
+                        if (distanceTo(marker.getPosition(), latLng) < 100) isOK = false;
+                    }
+                    if (isOK) {
+                        MarkerOptions markerOptions = new MarkerOptions()
+                                .position(latLng)
+                                .title("YAHOO BING GIIGLE")
+                                .snippet("this is a description string")
+                                .icon(bitmapDescriptor);
+                        Marker a = map.addMarker(markerOptions);
+                        a.setTag(bitmapDescriptor);
+                        markerList.add(a);
+                        lyShow();
 //                Animation tweenAnimation = AnimationUtils.loadAnimation(MapsActivity.this, R.anim.tween);
 //                lyLower.startAnimation(tweenAnimation);
 //                lyLower.setVisibility(View.GONE);
-                    canClick = false;
+                        canClick = false;
+                    }
+                    else showToast("distance too smol");
                 }
             }
         });
@@ -342,8 +347,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             if (a && b) {
                 getLocation();
             } else {
+                showToast("I dont have enough permissions 😢");
             }
-            showToast("I dont have enough permissions 😢");
         }
     });
 
@@ -376,5 +381,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    public int distanceTo(LatLng start, LatLng end) {
 
+        Location startPoint = new Location("locationA");
+        startPoint.setLatitude(start.latitude);
+        startPoint.setLongitude(start.longitude);
+
+        Location endPoint = new Location("locationA");
+        endPoint.setLatitude(end.latitude);
+        endPoint.setLongitude(end.longitude);
+
+        int distance = (int) startPoint.distanceTo(endPoint);
+        showToast(distance + "");
+        return distance;
+    }
 }

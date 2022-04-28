@@ -17,11 +17,13 @@ public class Update extends Thread {
     Handler handler;
     GameState gameState;
     MainActivity mainActivity;
-    public Update(Handler handler, GameState gameState, MainActivity mainActivity
-    ) {
+    Double updateTime;
+
+    public Update(Handler handler, GameState gameState, MainActivity mainActivity, Double updateTime) {
         this.mainActivity = mainActivity;
         this.gameState = gameState;
         this.handler = handler;
+        this.updateTime = updateTime;
     }
 
     @Override
@@ -29,18 +31,18 @@ public class Update extends Thread {
         super.run();
         Log.d("GAD", "run: " + Thread.currentThread().getId() + "    Priority:" + Thread.currentThread().getPriority());
         while (!this.isInterrupted()) {
-            if (Thread.currentThread().isInterrupted()) Log.d("GAD", "run: RUN YOU FOOl");
+            Log.d("GAD", "run: RUN YOU FOOl");
 
-            gameState.update(0.2);
+            gameState.update(this.updateTime);
             //this.mainActivity.notifyAdapter();
 
             Message msg = new Message();
             msg.obj = "REEEEEEEEEEEEEEEE";
             handler.sendMessage(msg);
 
-            SystemClock.sleep(200);
+            SystemClock.sleep((int) (this.updateTime * 1000));
 
-         }
+        }
 
 
     }

@@ -25,7 +25,7 @@ public class GameState {
 
     public GameState(MainActivity main) {
         this.main = main;
-        this.resourcesNames = new String[]{"iron", "watermelons", "ducks", "pancakes", "wood", "spice melange", "rightful vengeance", "Oz Slaves", "cough", "cough 2 ", "MOAR RESOURCE", "EVEN MOAOOAOOAOAOR"};
+        this.resourcesNames = new String[]{"iron", "melons", "ducks", "pancakes", "wood", "spice melange", "rightful vengeance", "Oz Slaves", "cough", "cough 2 ", "MOAR RESOURCE", "EVEN MOAOOAOOAOAOR"};
         this.resourcesList = new Resource[this.resourcesNames.length];
         this.resourceArrList = new ArrayList<>();
         initiateFactoryList();
@@ -146,9 +146,9 @@ public class GameState {
             }
 
         }
-
-        for (String bigkey : finalProductionMap.keySet()) {
-            if (finalProductionMap.get(bigkey) < 0) {
+//this checks for minuses in prod map
+        /*for (String bigkey : finalProductionMap.keySet()) {
+            if (finalProductionMap.get(bigkey) < 0) {method
                 for (String key : finalProductionMap.keySet()) {
                     finalProductionMap.put(key, 0.0D);
                 }
@@ -160,7 +160,7 @@ public class GameState {
             } catch (Exception e) {
                 Log.e("GAD", "calculateProduction: " + e.getMessage());
             }
-        }
+        }*/
         return finalProductionMap;
     }
 
@@ -233,7 +233,22 @@ public class GameState {
     }
 
     public void destroyLastFactory() {
-        lastBuiltFactory.addFactoryCount(-1);
+        int spot = getFactroySpotInList(lastBuiltFactory);
+        sellFactory(spot);
+
+    }
+
+    private int getFactroySpotInList(Factory lastBuiltFactory) {
+        for (int i = 0; i < factoryList.size(); i++) {
+            Factory factory = factoryList.get(i);
+            if (factory == lastBuiltFactory) {
+                main.showToast("SCREAM");
+                return i;
+            }
+
+        }
+        main.showToast("problem occured -getFactorySpotInList-");
+        return -1;
     }
 
     public void setLastFactoryPos(LatLng pos) {

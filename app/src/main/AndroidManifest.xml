@@ -16,9 +16,6 @@
             android:name=".ui.MapsActivity"
             android:exported="false" />
         <activity
-            android:name=".MapsActivityFALSE"
-            android:exported="false" />
-        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

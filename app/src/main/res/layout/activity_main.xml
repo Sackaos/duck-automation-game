@@ -17,7 +17,7 @@
         android:weightSum="1">
 
         <ListView
-            android:id="@+id/lvResourceList"
+            android:id="@+id/lv_ResourceList"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="0.6"
@@ -25,13 +25,61 @@
             android:dividerHeight="1.5dp"
             android:footerDividersEnabled="false" />
 
-
-        <Button
-            android:id="@+id/btn_Map"
+        <LinearLayout
+            android:id="@+id/ly_MainMenu"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:text="map"
-            />
+            android:layout_height="0dp"
+            android:layout_weight="0.4"
+            android:orientation="vertical"
+            android:weightSum="1">
+
+            <Button
+                android:id="@+id/btn_Map"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="map" />
+
+            <Button
+                android:id="@+id/btn_Settings"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="Settings" />
+
+            <Button
+                android:id="@+id/btn_Exit"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="Exit" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ly_Settings"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0"
+            android:orientation="vertical"
+            android:weightSum="1">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Settings"
+                android:textColor="@color/teal_200"
+
+                android:textSize="40sp" />
+
+            <Switch
+                android:id="@+id/switch_Settings_Power"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Power Saving Mode" />
+
+            <Button
+                android:id="@+id/btn_Settings_Back"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="Back" />
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -44,7 +92,7 @@
         android:weightSum="1">
 
         <ListView
-            android:id="@+id/lvFactories"
+            android:id="@+id/lv_Factories"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="3dp"

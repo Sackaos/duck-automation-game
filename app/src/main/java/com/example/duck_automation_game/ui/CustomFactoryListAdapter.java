@@ -58,12 +58,13 @@ public class CustomFactoryListAdapter extends ArrayAdapter<Factory> {
         for (String key : costMap.keySet()) {
             Double currentFactoryCost = costMap.get(key) * (temp.getFactoryAmount() * 1.5);
             String str = key + ": " + currentFactoryCost;
-            costText = costText + "\n" + str;
+            costText =  str + "\n" + costText;
         }
+        //gameState.main.showToast(costText);
         for (String key : prodMap.keySet()) {
             Double currentFactoryProd = prodMap.get(key);
             String str = key + ": " + currentFactoryProd;
-            prodText = prodText + "\n" + str;
+            prodText = str + "\n" + prodText;
         }
         tvFactoryCost.setText(costText);
         tvFactoryProduction.setText(prodText);

@@ -19,7 +19,7 @@ public class GameState {
     public ArrayList<Factory> factoryList;
     ArrayList<CustomResourceModel> resourceArrList;
     String[] resourcesNames;
-    MainActivity main;
+    public MainActivity main;
 
     public GameState(MainActivity main) {
         this.main = main;

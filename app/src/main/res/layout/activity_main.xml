@@ -25,19 +25,34 @@
             android:dividerHeight="1.5dp"
             android:footerDividersEnabled="false" />
 
-        <Button
+        <ListView
+            android:id="@+id/lvMenu"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:onClick="changeToMapActivity"
-            android:text="button" />
+            android:layout_height="0dp"
+            android:layout_weight="0.4"
+            android:divider="@color/material_blue_grey_800"
+            android:dividerHeight="1.5dp"
+            android:footerDividersEnabled="false"
+
+            />
+
 
     </LinearLayout>
+
+    <TextView
+        android:layout_weight="0.005"
+        android:id="@+id/divider"
+        android:layout_width="0.3dp"
+        android:layout_height="match_parent"
+        android:text=" "
+        android:background="@color/BuyBtn"
+        />
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_marginTop="15dp"
-        android:layout_weight="0.6"
+        android:layout_weight="0.595"
         android:orientation="horizontal"
         android:weightSum="1">
 
@@ -47,7 +62,7 @@
             android:layout_height="match_parent"
             android:layout_marginLeft="3dp"
             android:layout_weight="0.1"
-            android:divider="@color/material_blue_grey_800"
+            android:divider="@color/darkGary"
             android:dividerHeight="1dp"
             android:footerDividersEnabled="false" />
 

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -12,7 +13,10 @@ import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.duck_automation_game.engine.Factory;
@@ -54,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         createResourceAdapter();
         factoryList = gameState.getPlayerfactories();
         createFactoryAdapter();
+        createMenuAdapter();
         initiateUpdater(this);
         Log.d(TAG, "on create: completed");
     }
@@ -94,6 +99,37 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //        adapter.notifyDataSetChanged();
 
     }
+
+    public void createMenuAdapter() {
+
+        String menuTitles[] =new String[] {"Factories", "Map", "Technologies", "Stuff", "settings"};
+        ListView menuListView = findViewById(R.id.lvMenu);
+        ArrayAdapter<String> menuAdapter = new ArrayAdapter<String>(
+                this, android.R.layout.simple_list_item_1,android.R.id.text1, menuTitles);
+        menuListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //change all backrounds to gary and darkGary
+                switch((String)((TextView) view).getText()) {
+                    case "Map":
+                        view.setBackgroundColor(getResources().getColor(R.color.darkGary));
+                        ((TextView) view).setTextColor(getResources().getColor(R.color.white));
+                        break;
+
+                    case "Technologies":
+                        break;
+
+                }
+            }
+        });
+        menuListView.setAdapter(menuAdapter);
+    }
+
+//if want add new resource mid-game :
+//        playerProduction.put("NEWRESOURCE",0d);
+//        playerResource.put("NEWRESOURCE",0d);
+//        resourceArr.add(new CustomListItemModel("NEWRESOURCE",playerResource.get("NEWRESOURCE"),formatProductionValue(playerProduction.get("NEWRESOURCE"))));
+//        adapter.notifyDataSetChanged();
 
 
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -245,8 +281,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         factoryAdapter.setSellbtnColor(color);
         notifyFactoryAdapter();
     }
-    public void changeToMapActivity(View view){
-        Intent intent = new Intent(this,MapsActivity.class);
+
+    public void changeToMapActivity(View view) {
+        Intent intent = new Intent(this, MapsActivity.class);
         startActivity(intent);
     }
 }

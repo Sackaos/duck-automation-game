@@ -47,6 +47,7 @@ public class CustomFactoryListAdapter extends ArrayAdapter<Factory> {
         TextView tvFactoryAmount = (TextView) view.findViewById(R.id.tvFactoryAmount);
         TextView tvFactoryProduction = (TextView)view.findViewById(R.id.tvFactoryProduction);
         Button btnFactoryBuy = (Button) view.findViewById(R.id.btnBuy);
+        Button btnFactoryBuy5 = (Button) view.findViewById(R.id.btnBuy5);
         Button btnFactorySell = (Button) view.findViewById(R.id.btnSell);
         Factory temp = objects.get(position);
 
@@ -71,7 +72,13 @@ public class CustomFactoryListAdapter extends ArrayAdapter<Factory> {
         btnFactoryBuy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                gameState.buildFactory(position);
+                gameState.buildFactory(position,temp.getFactoryName(),1);
+            }
+        });
+        btnFactoryBuy5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gameState.buildFactory(position,temp.getFactoryName(),5);
             }
         });
         btnFactorySell.setOnClickListener(new View.OnClickListener() {
@@ -81,13 +88,9 @@ public class CustomFactoryListAdapter extends ArrayAdapter<Factory> {
             }
         });
         //tvFactoryAmount.setText(temp.get);
-        btnFactorySell.setBackgroundColor(sellbtnColor);
+        //btnFactorySell.setBackgroundColor(sellbtnColor);
 
         return view;
-    }
-
-    public void setSellbtnColor(int color){
-        this.sellbtnColor = ContextCompat.getColor(getContext(), color);
     }
 
 }

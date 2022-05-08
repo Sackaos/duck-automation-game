@@ -2,9 +2,11 @@ package com.example.duck_automation_game;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -37,6 +39,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+    public static final String DUCK_COUNTER_PREFKEY = "duckcounterprefkey";
     private static final int MAP_ACTIVITY_RESULT_CODE = 15;
     GameState gameState;
     Resource[] resourcesList;
@@ -55,10 +58,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         sharedPref = getSharedPreferences("myPrefs", MODE_PRIVATE);
         gameState = new GameState(this);
+        checkForDuckWin();
         resourcesList = gameState.getResourceList();
         resourceArrList = gameState.getResourceArrList();
         createResourceAdapter();
@@ -131,19 +136,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mapBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                changeToMapActivity(false);
+                changeToMapActivity(false, "setOnclicks:137");
             }
         });
 
-        View.OnClickListener my = new View.OnClickListener() {
+
+        Button backBtnSettings = findViewById(R.id.btn_Settings_Back);
+        View.OnClickListener backToMenuListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showLayoutMenu(R.id.ly_MainMenu);
             }
         };
-
-        Button backBtnSettings = findViewById(R.id.btn_Settings_Back);
-        backBtnSettings.setOnClickListener(my);
+        backBtnSettings.setOnClickListener(backToMenuListener);
 
         Button settingsBtn = findViewById(R.id.btn_Settings);
         settingsBtn.setOnClickListener(new View.OnClickListener() {
@@ -184,8 +189,92 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 alert.show();
             }
         });
+
+        Button resetSharedPreferencesBtn = findViewById(R.id.btn_Settings_resetPref);
+        resetSharedPreferencesBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                builder.setMessage("are you sure you want to reset All progress (and settings)?")
+                        .setCancelable(false)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                sharedPref.edit().clear().commit();
+                                triggerRebirth(MainActivity.this, MainActivity.class);
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                                showToast("K, be careful next time");
+                            }
+                        }).setTitle("Reset App?");
+                //Creating dialog box
+                AlertDialog alert = builder.create();
+                alert.show();
+            }
+        });
+
+        Button duckCreationBtn = findViewById(R.id.btn_Create_Duck);
+        duckCreationBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //pay 1000 iron for a duck
+                for (CustomResourceModel resource:resourceArrList) {
+                    String currentName = resource.getResourceName();
+                    if (currentName.equals("spice melange")){
+                        resource.setResourceAmount(resource.getResourceAmount()-100D);
+                    break;
+                    }
+                }
+                gameState.duckCounter++;
+                checkForDuckWin();
+
+            }
+        });
+
+        //end of Onclicks
     }
 
+    private void checkForDuckWin() {
+        if(gameState.duckCounter>=10){
+            showToast("OMG YOU WON");
+        changeToWinActivity();
+        }
+
+    }
+
+    private void changeToWinActivity() {
+        Intent intent = new Intent(this, com.example.duck_automation_game.ui.WinActivity.class);
+        else startActivity(intent);
+    }
+
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+        if (adapterView.getAdapter() instanceof CustomResourceListAdapter) {
+            String resourceName = resourcesList[i].getName();
+            if (resourceName.equals("iron") || resourceName.equals("watermelons")) {
+                Log.d(TAG, "onItemClick: resource clicked");
+                CustomResourceModel currentItem = resourceArrList.get(i);
+                Double newAmount = currentItem.getResourceAmount() + 1D;
+                currentItem.setResourceAmount(newAmount);
+
+            }
+        }
+
+        if (adapterView.getAdapter() instanceof CustomFactoryListAdapter) {
+            Log.d(TAG, "onItemClick: " + factoryList.get(i).getFactoryName());
+        }
+
+        notifyResourceAdapter();
+    }
+
+    public static void triggerRebirth(Context context, Class myClass) {
+        Intent intent = new Intent(context, myClass);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        context.startActivity(intent);
+        Runtime.getRuntime().exit(0);
+    }
 
     private void showLayoutMenu(int layoutID) {
         LinearLayout newLayout = findViewById(layoutID);
@@ -204,32 +293,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         );
     }
 
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-        if (adapterView.getAdapter() instanceof CustomResourceListAdapter) {
-            String resourceName = resourcesList[i].getName();
-            if (resourceName.equals("iron") || resourceName.equals("watermelons")) {
-                Log.d(TAG, "onItemClick: resource clicked");
-                CustomResourceModel currentItem = resourceArrList.get(i);
-                Double newAmount = currentItem.getResourceAmount() + 1D;
-                currentItem.setResourceAmount(newAmount);
-
-            }
-        }
-
-        if (adapterView.getAdapter() instanceof CustomFactoryListAdapter) {
-            Log.d(TAG, "onItemClick: " + factoryList.get(i).getFactoryName());
-
-        }
-
-
-        notifyResourceAdapter();
-//        if (resourceName.equals("iron")) updater.interrupt();
-//
-//        for (String key : playerResource.keySet()) {
-//            Log.d(TAG, "PlayerResource(map): " +playerResource.get(key));
-//        }
-    }
 
     /**
      * every time theres a change in the data the view needs to get updated which is what notifyAdapter does
@@ -270,10 +333,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //####################...Activities Stuff?#########################
 
 
-    public void changeToMapActivity(Boolean canClick) {
+    public void changeToMapActivity(Boolean canClick, String factoryName) {
 
         Intent intent = new Intent(this, com.example.duck_automation_game.ui.MapsActivity.class);
         intent.putExtra("canClick", canClick);
+        intent.putExtra("factoryName", factoryName);
 
 
         if (canClick == true) startActivityForResult(intent, MAP_ACTIVITY_RESULT_CODE);
@@ -295,12 +359,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     gameState.setLastFactoryPos(pos);
                 } else gameState.destroyLastFactory();
             }
-
+            String factoryName = data.getStringExtra("factoryName");
             if (resultCode == Activity.RESULT_CANCELED) {
                 // Write your code if there's no result
 
                 showToast("you came back from the dead didnt you");
-                changeToMapActivity(true);
+                changeToMapActivity(true, factoryName);
             }
         }
     }

@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/mainBG"
+    android:forceDarkAllowed="false"
     android:orientation="horizontal"
     android:weightSum="1"
     tools:context=".MainActivity">
@@ -29,6 +30,7 @@
             android:id="@+id/ly_MainMenu"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginTop="5dp"
             android:layout_weight="0.4"
             android:orientation="vertical"
             android:weightSum="1">
@@ -37,19 +39,23 @@
                 android:id="@+id/btn_Map"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:text="map" />
+                android:text="map"
+                android:theme="@style/DefaultButton" />
 
             <Button
                 android:id="@+id/btn_Settings"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:text="Settings" />
+                android:text="Settings"
+                android:theme="@style/DefaultButton" />
 
             <Button
                 android:id="@+id/btn_Exit"
+                style="@style/DefaultButton"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:text="Exit" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -63,43 +69,69 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/button_default_backround"
+                android:backgroundTint="@color/secondaryBG"
                 android:text="Settings"
-                android:textColor="@color/teal_200"
-
-                android:textSize="40sp" />
+                android:textColor="@color/white"
+                android:textSize="20sp" />
 
             <Switch
                 android:id="@+id/switch_Settings_Power"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Power Saving Mode" />
+                android:layout_marginVertical="5dp"
+                android:background="@drawable/button_default_backround"
+                android:backgroundTint="@color/secondaryBG"
+                android:text="Power Saving Mode"
+                android:textColor="@color/white" />
+
+            <Button
+                android:id="@+id/btn_Settings_resetPref"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="4dp"
+                android:background="@drawable/button_default_backround"
+                android:text="Reset Progress" />
 
             <Button
                 android:id="@+id/btn_Settings_Back"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
+                android:backgroundTint="@color/secondaryBG"
                 android:text="Back" />
+
         </LinearLayout>
 
     </LinearLayout>
+
+    <TextView
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="2dp"
+        android:background="@color/light_pink" />
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_marginTop="15dp"
-        android:layout_weight="0.6"
-        android:orientation="horizontal"
+        android:layout_weight="0.58"
+        android:orientation="vertical"
         android:weightSum="1">
 
         <ListView
             android:id="@+id/lv_Factories"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="3dp"
-            android:layout_weight="0.1"
             android:divider="@color/material_blue_grey_800"
             android:dividerHeight="1dp"
             android:footerDividersEnabled="false" />
+
+        <Button
+            android:id="@+id/btn_Create_Duck"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Create Duck(troll)" />
 
     </LinearLayout>
 

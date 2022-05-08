@@ -7,11 +7,16 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="beige">#F9C73F</color>
+    <color name="beige">#FFD35C</color>
     <color name="gary">#BCBCBC</color>
-    <color name="blue">#006ED9</color>
+    <color name="blue">#3E94E7</color>
+    <color name="btnGeneric">#D57DE4</color>
     <color name="btnSell">#FFD369EE</color>
-    <color name="btnSell2">#FFFFFF</color>
+    <color name="btnBuy">#BB8FE6</color>
     <color name="mainBG">#383838</color>
+    <color name="secondaryBG">#858585</color>
+    <color name="positive_red">#FF6C62</color>
+    <color name="positive_green">#9FFF4A</color>
+    <color name="light_pink">#FF83F3</color>
 
 </resources>

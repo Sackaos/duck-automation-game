@@ -60,6 +60,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     Boolean canClick;
     LinearLayout lyLower;
     BitmapDescriptor bitmapDescriptor;
+    String factoryName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +75,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(resizeMapIcons("factory_icon2", 200, 200));
         mvMap.getMapAsync(this);
         canClick = getIntent().getBooleanExtra("canClick", false);
+        factoryName = getIntent().getStringExtra("factoryName");
         lyLower = findViewById(R.id.ly_mapsLower);
         lyGone();
         setOnClicks();
@@ -89,10 +91,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 returnIntent.putExtra("did_buy", true);
                 LatLng factoryPosition = markerList.get(markerList.size() - 1).getPosition();
                 returnIntent.putExtra("factory_position", factoryPosition);
+
+                returnIntent.putExtra("factoryName", factoryName);
+
                 setResult(Activity.RESULT_OK, returnIntent);
                 finish();
             }
         });
+
         Button deny = findViewById(R.id.btn_factoryDeny);
         deny.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -122,7 +128,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             // do something with the location
                             currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
                             float zoomLevel = 18f;
-                            gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, zoomLevel));
+                            //gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, zoomLevel));
+                            gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, zoomLevel));
                             zoomLevel = 16f;
                             gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, zoomLevel));
 
@@ -209,19 +216,29 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     if (isOK) {
                         MarkerOptions markerOptions = new MarkerOptions()
                                 .position(latLng)
-                                .title("YAHOO BING GIIGLE")
-                                .snippet("this is a description string")
+                                .title(factoryName)
+                                .snippet(latLng + "")
                                 .icon(bitmapDescriptor);
                         Marker a = map.addMarker(markerOptions);
                         a.setTag(bitmapDescriptor);
                         markerList.add(a);
                         lyShow();
+                        gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(a.getPosition(), 16f));
+
 //                Animation tweenAnimation = AnimationUtils.loadAnimation(MapsActivity.this, R.anim.tween);
 //                lyLower.startAnimation(tweenAnimation);
 //                lyLower.setVisibility(View.GONE);
                         canClick = false;
+                    } else showToast("distance too smol");
+                }
+                else{
+                    Marker closestMarker=markerList.get(0);
+                    for (Marker marker:markerList) {
+                    if (distanceTo(latLng,marker.getPosition())<distanceTo(latLng,closestMarker.getPosition())){}
+                    closestMarker=marker;
                     }
-                    else showToast("distance too smol");
+                    float zoomLevel = 16f;
+                    gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(closestMarker.getPosition(), zoomLevel));
                 }
             }
         });
@@ -392,7 +409,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         endPoint.setLongitude(end.longitude);
 
         int distance = (int) startPoint.distanceTo(endPoint);
-        showToast(distance + "");
         return distance;
     }
 }

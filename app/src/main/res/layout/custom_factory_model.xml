@@ -57,17 +57,20 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="3dp"
                 android:text="costMap \ncostMap2"
-                android:textColor="@color/white"
-                android:textSize="12sp"
-                />
+                android:textColor="@color/positive_red"
+                android:textSize="12sp" />
         </LinearLayout>
+
+        <TextView
+            android:layout_width="3dp"
+            android:layout_height="match_parent"
+            android:background="@color/gary" />
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="match_parent"
@@ -83,8 +86,8 @@
                 android:layout_marginLeft="3dp"
                 android:layout_marginTop="3dp"
                 android:text="ProdMap \nProdMap"
-                android:textSize="12sp"
-            android:textColor="@color/white" />
+                android:textColor="@color/positive_green"
+                android:textSize="12sp" />
 
         </LinearLayout>
 
@@ -93,16 +96,25 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginLeft="8dp">
+        android:layout_marginLeft="8dp"
+        android:orientation="horizontal">
 
 
         <Button
             android:id="@+id/btnBuy"
             android:layout_width="50dp"
             android:layout_height="30dp"
-            android:backgroundTint="#d369ee"
+            android:backgroundTint="@color/btnBuy"
             android:text="buy"
+            android:textSize="7sp" />
+
+        <Button
+            android:id="@+id/btnBuy5"
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="3dp"
+            android:backgroundTint="@color/btnBuy"
+            android:text="buy 5"
             android:textSize="7sp" />
 
 
@@ -111,7 +123,7 @@
             android:layout_width="50dp"
             android:layout_height="30dp"
             android:layout_marginLeft="3dp"
-            android:backgroundTint="#a555f4"
+            android:backgroundTint="@color/btnSell"
             android:text="sell"
             android:textSize="7sp" />
     </LinearLayout>

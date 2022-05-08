@@ -24,7 +24,7 @@ public class CustomResourceModel {
         return this.resourceProduction;
     }
     public Double getResourceAmount() {
-        return this.resourceAmount;
+        return this.resourceAmount.doubleValue();
     }
 
     public void setResourceProduction(Double resourceProduction) {

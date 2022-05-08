@@ -31,8 +31,7 @@ public class Update extends Thread {
         super.run();
         Log.d("GAD", "run: " + Thread.currentThread().getId() + "    Priority:" + Thread.currentThread().getPriority());
         while (!this.isInterrupted()) {
-            Log.d("GAD", "run: RUN YOU FOOl");
-
+            
             gameState.update(this.updateTime);
             //this.mainActivity.notifyAdapter();
 

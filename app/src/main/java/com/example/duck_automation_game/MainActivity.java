@@ -246,7 +246,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void changeToWinActivity() {
         Intent intent = new Intent(this, com.example.duck_automation_game.ui.WinActivity.class);
-        else startActivity(intent);
+        startActivity(intent);
     }
 
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {

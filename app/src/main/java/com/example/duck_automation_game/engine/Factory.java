@@ -11,19 +11,8 @@ public class Factory {
     String name;
     Map<String, Double> productionMap;
     Map<String, Double> costMap;
-
-    public LatLng getPosition() {
-        return position;
-    }
-
-    public void setPosition(LatLng position) {
-        this.position = position;
-    }
-
     LatLng position;
-    int factoryAmount;
-
-    Button btnBuy;
+    int factoryAmount = 0;
 
     public Factory(String name, Map<String, Double> productionMap, Map<String, Double> costMap) {
         this.name = name;
@@ -39,9 +28,17 @@ public class Factory {
         this.factoryAmount = factoryAmount;
     }
 
+    public LatLng getPosition() {
+        return position;
+    }
+
+    public void setPosition(LatLng position) {
+        this.position = position;
+    }
+
 
     public void addFactoryCount(int toAdd) {
-        this.factoryAmount = this.factoryAmount + toAdd;
+        this.factoryAmount += toAdd;
     }
 
     public String getFactoryName() {
@@ -65,6 +62,6 @@ public class Factory {
     }
 
     public void destroyFactory() {
-        this.factoryAmount = this.factoryAmount - 1;
+        this.factoryAmount -= 1;
     }
 }

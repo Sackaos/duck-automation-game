@@ -40,7 +40,7 @@ public class GameState {
     private void getDuckCounter() {
 
         String duckCounterString = main.getStringFromPref(main.DUCK_COUNTER_PREFKEY, "0");
-        if (duckCounterString.equals("")) duckCounter=0;
+        if (duckCounterString.equals("")) duckCounter = 0;
         else {
             duckCounter = Integer.parseInt(duckCounterString);
         }
@@ -79,7 +79,7 @@ public class GameState {
         factoryMap2.put("pancakes", 1.0D);
         HashMap<String, Double> costMap2 = new HashMap<>();
         costMap2.put("watermelons", 10.0D);
-        Factory newFactory2 = new Factory("pancake Factory", factoryMap2, costMap2,0);
+        Factory newFactory2 = new Factory("pancake Factory", factoryMap2, costMap2, 0);
         factoryList.add(newFactory2);
 
         HashMap<String, Double> factoryMap3 = new HashMap<>();
@@ -90,7 +90,7 @@ public class GameState {
         costMap3.put("watermelons", 10.0D);
         costMap3.put("pancakes", 5.0D);
 
-        Factory newFactory3 = new Factory("spice melange Factory", factoryMap3, costMap,0);
+        Factory newFactory3 = new Factory("spice melange Factory", factoryMap3, costMap, 0);
         factoryList.add(newFactory3);
 
 
@@ -162,7 +162,7 @@ public class GameState {
             //for every resourced produced/consumed by the factory
             for (String key : currentFactory.productionMap.keySet()) {
                 Double currentProduction = finalProductionMap.get(key);
-                Double newProduction = currentProduction + currentFactory.productionMap.get(key)*currentFactory.getFactoryAmount();
+                Double newProduction = currentProduction + currentFactory.productionMap.get(key) * currentFactory.getFactoryAmount();
                 finalProductionMap.put(key, newProduction);
             }
 
@@ -217,7 +217,7 @@ public class GameState {
         for (String key : factory.costMap.keySet()) {
             Double currentFactoryCost = factory.costMap.get(key) * (factory.getFactoryAmount() * 1.5);
             CustomResourceModel currentItem = findResourceByKey(key);
-            if (currentItem.getResourceAmount() < currentFactoryCost*amount) {
+            if (currentItem.getResourceAmount() < currentFactoryCost * amount) {
                 canAfford = false;
                 break;
             }
@@ -225,12 +225,12 @@ public class GameState {
 
         //makes the player pay for his factory
         if (canAfford == true) {
-            main.changeToMapActivity(true,factoryName);
+            main.changeToMapActivity(true, factoryName);
 
             for (String key : factory.costMap.keySet()) {
                 CustomResourceModel currentItem = findResourceByKey(key);
                 Double currentFactoryCost = factory.costMap.get(key) * (factory.getFactoryAmount() * 1.5);
-                currentItem.setResourceAmount(currentItem.getResourceAmount() - currentFactoryCost*amount);
+                currentItem.setResourceAmount(currentItem.getResourceAmount() - currentFactoryCost * amount);
             }
             lastBuiltFactory = factory;
             factory.addFactoryCount(amount);

@@ -9,11 +9,13 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -21,8 +23,12 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.duck_automation_game.engine.BatteryReceiver;
+import com.example.duck_automation_game.engine.CosmicCreatures;
+import com.example.duck_automation_game.engine.CosmicDuck;
 import com.example.duck_automation_game.engine.Factory;
 import com.example.duck_automation_game.engine.GameState;
 import com.example.duck_automation_game.engine.Resource;
@@ -37,7 +43,14 @@ import com.google.gson.reflect.TypeToken;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
+interface StringFunction {
+    String run(String str);
+}
+
+
+//just as a פרוטוקול i know this "game" is incomplete and very lacking but the foundation is here i just need to actually think of ways the factories combine well with each other and i need to add some other features like when seling a factory it will remove a factory on the map, the fact that the map currently is pretty useless, etc.
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
     public static final String DUCK_COUNTER_PREFKEY = "duckcounterprefkey";
     private static final int MAP_ACTIVITY_RESULT_CODE = 15;
@@ -54,7 +67,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     String TAG = "GAD";
     Boolean powerSavingMode = false;
     AlertDialog.Builder builder;
-
+    private BatteryReceiver receiver;
+    MainActivity main = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,13 +87,31 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         builder = new AlertDialog.Builder(this);
         setOnClicks();
         Log.d(TAG, "on create: completed");
+        receiver = new BatteryReceiver();
+        createCosmicEntities();
 
+    }
+
+    private void createCosmicEntities() {
+        CosmicCreatures creatures[] = new CosmicCreatures[2];
+        creatures[0] = new CosmicDuck();
+        creatures[1] = new CosmicDuck();
+        creatures[0].fart(creatures[1]);
+        if (creatures[1].getSmelly()) {
+            Log.d("Cosmic", "sheesh he smelly");
+            //are you happy now am i done with parents/children
+            //also technically this (main) extends AppCompatActivity so i shouldnt even need to do that >:(
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         initiateUpdater();
+
+        IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_LOW);
+        registerReceiver(receiver, filter);
+
     }
 
     private void initiateUpdater() {
@@ -132,6 +164,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void setOnClicks() {
+        //map section
         Button mapBtn = findViewById(R.id.btn_Map);
         mapBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
-
+        //settings section
         Button backBtnSettings = findViewById(R.id.btn_Settings_Back);
         View.OnClickListener backToMenuListener = new View.OnClickListener() {
             @Override
@@ -167,67 +200,76 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
-        Button exitBtn = findViewById(R.id.btn_Exit);
-        exitBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                builder.setMessage("Do you want to close this application ?")
-                        .setCancelable(false)
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                finish();
-                            }
-                        })
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                                showToast("phew");
-                            }
-                        }).setTitle("Exit Tialoge");
-                //Creating dialog box
-                AlertDialog alert = builder.create();
-                alert.show();
-            }
-        });
-
         Button resetSharedPreferencesBtn = findViewById(R.id.btn_Settings_resetPref);
         resetSharedPreferencesBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                builder.setMessage("are you sure you want to reset All progress (and settings)?")
-                        .setCancelable(false)
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                sharedPref.edit().clear().commit();
-                                triggerRebirth(MainActivity.this, MainActivity.class);
-                            }
-                        })
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                                showToast("K, be careful next time");
-                            }
-                        }).setTitle("Reset App?");
-                //Creating dialog box
-                AlertDialog alert = builder.create();
-                alert.show();
+                Consumer<Integer> whenAccept = (n) -> {
+                    sharedPref.edit().clear().commit();
+                    triggerRebirth(MainActivity.this, MainActivity.class);
+                };
+
+                Consumer<Integer> whenDeny = (n) -> {
+                    showToast("K, be careful next time");
+                };
+
+                String description = "are you sure you want to reset All progress (and settings)?";
+
+                displayDialog("Reset App?", description, "yes", whenAccept, "no", whenDeny);
             }
         });
 
-        Button duckCreationBtn = findViewById(R.id.btn_Create_Duck);
+        //Help section
+        Button backBtnHelp = findViewById(R.id.btn_Help_Back);
+        backBtnHelp.setOnClickListener(backToMenuListener);
+
+        Button HelpBtn = findViewById(R.id.btn_Help);
+        HelpBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showLayoutMenu(R.id.ly_Help);
+            }
+        });
+
+        TextView instructionTv = findViewById(R.id.tv_InstructionManual);
+        instructionTv.setMovementMethod(new ScrollingMovementMethod());
+
+
+        //reset section
+        Button helpExitBtn = findViewById(R.id.btn_Help_Exit);
+        helpExitBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Consumer<Integer> whenAccept = (n) -> {
+                    finish();
+                };
+
+                Consumer<Integer> whenDeny = (n) -> {
+                    showToast("phew, we dont do that here! no leaving!");
+                };
+
+                String description = "Do you want to close this application ?";
+
+                displayDialog("Exit app?", description, "yes", whenAccept, "no", whenDeny);
+            }
+        });
+
+
+        Button duckCreationBtn = findViewById(R.id.btn_Create_Cannon);
         duckCreationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //pay 1000 iron for a duck
-                for (CustomResourceModel resource:resourceArrList) {
+                //pay 100 spice melange  for a duck
+                for (CustomResourceModel resource : resourceArrList) {
                     String currentName = resource.getResourceName();
-                    if (currentName.equals("spice melange")){
-                        resource.setResourceAmount(resource.getResourceAmount()-100D);
-                    break;
+                    if (currentName.equals("spice melange") && resource.getResourceAmount() >= 100D) {
+                        resource.setResourceAmount(resource.getResourceAmount() - 100D);
+                        gameState.duckCounter++;
+                        break;
                     }
                 }
-                gameState.duckCounter++;
                 checkForDuckWin();
 
             }
@@ -237,16 +279,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void checkForDuckWin() {
-        if(gameState.duckCounter>=10){
+        ((TextView) findViewById(R.id.tv_CannonCounter)).setText("Anti-Duck Cannons on the planet: " + gameState.duckCounter);
+        if (gameState.duckCounter >= 10) {
             showToast("OMG YOU WON");
-        changeToWinActivity();
+            changeToWinActivity();
         }
 
     }
 
     private void changeToWinActivity() {
         Intent intent = new Intent(this, com.example.duck_automation_game.ui.WinActivity.class);
-        else startActivity(intent);
+        startActivity(intent);
     }
 
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -277,10 +320,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void showLayoutMenu(int layoutID) {
-        LinearLayout newLayout = findViewById(layoutID);
-        LinearLayout oldLayout = findViewById(R.id.ly_MainMenu);
+        //i know this is stupid but honestly, why bother its all gonna end just a few days from now and this works perfectly fine so meh IDC
 
-        oldLayout.setLayoutParams(getDefaultLayoutParamsWithWeight(0f));
+        LinearLayout newLayout = findViewById(layoutID);
+        LinearLayout oldLayout1 = findViewById(R.id.ly_MainMenu);
+        LinearLayout oldLayout2 = findViewById(R.id.ly_Settings);
+        LinearLayout oldLayout3 = findViewById(R.id.ly_Help);
+
+        oldLayout1.setLayoutParams(getDefaultLayoutParamsWithWeight(0f));
+        oldLayout2.setLayoutParams(getDefaultLayoutParamsWithWeight(0f));
+        oldLayout3.setLayoutParams(getDefaultLayoutParamsWithWeight(0f));
+
         newLayout.setLayoutParams(getDefaultLayoutParamsWithWeight(0.4f));
 
     }
@@ -298,14 +348,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
      * every time theres a change in the data the view needs to get updated which is what notifyAdapter does
      */
     public void notifyResourceAdapter() {
-//        for (int i = 0; i < resourcesList.length; i++) {
-//            CustomListItemModel currentItem = resourceArrList.get(i);
-//            String currentItemName = currentItem.getResourceName();
-//            CustomListItemModel item = new CustomListItemModel(currentItemName, playerResource.get(currentItemName), playerProduction.get(currentItemName));
-//            resourceArrList.set(i, item);
-//        }
         resourceAdapter.notifyDataSetChanged();
-
     }
 
     public void notifyFactoryAdapter() {
@@ -363,7 +406,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             if (resultCode == Activity.RESULT_CANCELED) {
                 // Write your code if there's no result
 
-                showToast("you came back from the dead didnt you");
+                showToast("you came back without building a factory didnt you. THATS ILLEGAL");
                 changeToMapActivity(true, factoryName);
             }
         }
@@ -378,7 +421,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         testHashMap.put("maybe copper!", 0.1);
         testHashMap.put("that might be spice", 432.1);
         testHashMap.put("or is that worm poop", 23.1);
-        testHashMap.put("IG", 0.21);
+        testHashMap.put("I Guess", 0.21);
 
         //convert to string using gson
         Gson gson = new Gson();
@@ -405,7 +448,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         updater.interrupt();
         //SystemClock.sleep(201);
         saveDataToSharedPref();
-
+        unregisterReceiver(receiver);
 
     }
 
@@ -455,6 +498,38 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return sharedPref.getString(prefKey, defaultValue);
     }
 
+
+    /**
+     * creates a dialog
+     *
+     * @param title       title
+     * @param description description
+     * @param acceptText  accept
+     * @param cancelFunc  deny
+     * @param acceptFunc  acceptfunction
+     * @param cancelText  denyfunction
+     */
+    public void displayDialog(String title, String description, String acceptText, Consumer<Integer> acceptFunc, String cancelText, Consumer<Integer> cancelFunc) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(description)
+                .setCancelable(false)
+                .setPositiveButton(acceptText, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        acceptFunc.accept(0);
+                    }
+                })
+                .setNegativeButton(cancelText, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //dialog.cancel();
+                        cancelFunc.accept(0);
+                    }
+                }).setTitle(title);
+        //Creating dialog box
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
     //####################Menues stuff#########################
 
 }
+
+

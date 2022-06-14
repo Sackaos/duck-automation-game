@@ -12,6 +12,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Duckautomationgame">
+        <receiver
+            android:name=".engine.BatteryReceiver"
+            android:enabled="true"
+            android:exported="true"></receiver>
+
         <activity
             android:name=".ui.WinActivity"
             android:exported="false" />

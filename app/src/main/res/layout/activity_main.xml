@@ -50,11 +50,19 @@
                 android:theme="@style/DefaultButton" />
 
             <Button
-                android:id="@+id/btn_Exit"
+                android:id="@+id/btn_Help"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="Help"
+                android:theme="@style/DefaultButton" />
+
+            <Button
+                android:id="@+id/btn_Help_Exit"
                 style="@style/DefaultButton"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:text="Exit" />
+                android:text="Exit"
+                android:textSize="18sp" />
 
         </LinearLayout>
 
@@ -102,19 +110,47 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/ly_Help"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_InstructionManual"
+                android:layout_width="match_parent"
+                android:layout_height="220dp"
+                android:background="@drawable/button_default_backround"
+                android:backgroundTint="@color/secondaryBG"
+                android:scrollbars="vertical"
+                android:text="the objective of the game is to build ten Anti-Duck Cannons in order to defend the planet from the Very Dangerous and Very Territorial Cosmic Ducks.\n\n every Anti-Duck cannon costs 100 Spice Melange. Good luck soldier! "
+                android:textColor="@color/white"
+                android:textSize="15sp" />
+
+            <Button
+                android:id="@+id/btn_Help_Back"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:backgroundTint="@color/secondaryBG"
+                android:text="Back" />
+        </LinearLayout>
+
+
     </LinearLayout>
 
     <TextView
-        android:layout_width="1dp"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_marginLeft="2dp"
+        android:layout_weight="0.003"
         android:background="@color/light_pink" />
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_marginTop="15dp"
-        android:layout_weight="0.58"
+        android:layout_weight="0.5997"
         android:orientation="vertical"
         android:weightSum="1">
 
@@ -123,15 +159,30 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="3dp"
+            android:layout_weight="0.4"
             android:divider="@color/material_blue_grey_800"
             android:dividerHeight="1dp"
             android:footerDividersEnabled="false" />
 
         <Button
-            android:id="@+id/btn_Create_Duck"
+            android:id="@+id/btn_Create_Cannon"
+            style="@style/DefaultButton"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:text="Create Duck(troll)" />
+            android:layout_height="70dp"
+            android:text="Create Anti-Duck Cannon"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/tv_CannonCounter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/btnGeneric"
+            android:textColor="@color/gary"
+            android:textSize="18sp"
+
+
+
+            />
 
     </LinearLayout>
 

@@ -10,6 +10,12 @@ public class CustomMarker {
     String title;
     String snippet;
 
+    public CustomMarker(LatLng position, String title, String snippet) {
+        this.position = position;
+        this.title = title;
+        this.snippet = snippet;
+    }
+
     public LatLng getPosition() {
         return position;
     }
@@ -23,10 +29,4 @@ public class CustomMarker {
     }
 
 
-
-    public CustomMarker(LatLng position, String title, String snippet) {
-        this.position = position;
-        this.title = title;
-        this.snippet = snippet;
-    }
 }

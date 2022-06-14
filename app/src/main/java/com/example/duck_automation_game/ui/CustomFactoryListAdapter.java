@@ -27,7 +27,6 @@ public class CustomFactoryListAdapter extends ArrayAdapter<Factory> {
     Context context;
     List<Factory> objects;
     GameState gameState;
-    int sellbtnColor = R.color.purple_200;
 
     public CustomFactoryListAdapter(Context context, int resource, int textViewResourceId, ArrayList<Factory> factoryList, GameState gameState) {
         super(context, resource, textViewResourceId, factoryList);

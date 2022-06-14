@@ -43,6 +43,7 @@ public class CustomResourceListAdapter extends ArrayAdapter<CustomResourceModel>
         return view;
 
     }
+
     public String formatProductionValue(Double productionAmount) {
         productionAmount = Double.parseDouble(new DecimalFormat("#####.##").format(productionAmount));
         String s = "";

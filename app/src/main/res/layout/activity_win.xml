@@ -4,10 +4,31 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".ui.WinActivity">
-<TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="YOU WIN WOW YOU DID SUCH A GOOD JOOB WOW!"
-    android:textSize="90dp"
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="time left until the cosmic ducks would've destroyed the world: 3 Minutes and 22 seconds"
+        android:background="@color/mainBG"
+        android:textColor="@color/beige"></TextView>
+
+    <TextView
+        android:id="@+id/tv_Win"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="@color/mainBG"
+        android:scrollbars="vertical"
+
+        android:shadowColor="@color/white"
+        android:shadowDx="50"
+        android:shadowDy="0"
+        android:shadowRadius="150"
+
+        android:text="good job! you defended the planet from the cosmic ducks. well done!"
+        android:textColor="@color/purple_200"
+
+
+        android:textSize="75dp" ></TextView>
 </LinearLayout>
